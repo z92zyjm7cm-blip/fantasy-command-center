@@ -106,5 +106,9 @@ function importData(e){const file=e.target.files[0];if(!file)return;const reader
 function resetData(){if(confirm("Reset all local roster, matchup and waiver data on this device? Export a backup first if needed.")){localStorage.removeItem(KEY);state=load();renderAll()}}
 function renderAll(){renderHome();renderRoster();renderCategories();renderWaivers()}
 renderAll();
+  fetch("https://fantasy-command-center-api.z92zyjm7cm.workers.dev/")
+  .then(r => r.json())
+  .then(data => console.log("Worker reachable:", data))
+  .catch(err => console.error("Worker connection failed:", err));
 </script>
 </body></html>
