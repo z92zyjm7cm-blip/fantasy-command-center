@@ -107,17 +107,52 @@ function resetData(){if(confirm("Reset all local roster, matchup and waiver data
 function renderAll(){renderHome();renderRoster();renderCategories();renderWaivers()}
 renderAll();
 
+
 fetch("https://fantasy-command-center-api.z92zyjm7cm.workers.dev/api/dashboard")
   .then(r => {
     if (!r.ok) throw new Error("Dashboard request failed: " + r.status);
     return r.json();
   })
   .then(data => {
-    console.log("Live ESPN dashboard response:", data);
-    console.log("Available team names:", (data.teams || []).map(t => t.name));
-    console.log("Available team abbreviations:", (data.teams || []).map(t => t.abbreviation));
+    if (!data.teams) throw new Error("No team data returned.");
+
+    const team = data.teams.find(t =>
+      (t.name || "").toLowerCase().includes("gold")
+    );
+
+    if (!team || !team.roster) {
+      throw new Error("Could not find the gold team's roster.");
+    }
+
+    const positionNames = {
+      1: "PG",
+      2: "SG",
+      3: "SF",
+      4: "PF",
+      5: "C"
+    };
+
+    state.roster = team.roster.map(p => ({
+      name: p.name,
+      team: team.abbreviation || team.name,
+      pos: positionNames[p.position] || "Unknown",
+      slot: String(p.lineupSlotId ?? ""),
+      status: /OUT|INJURED/i.test(p.injuryStatus || "")
+        ? "Out"
+        : (p.injuryStatus === "NORMAL" ? "Active" : "Unknown"),
+      games: 0,
+      notes: ""
+    }));
+
+    save();
+
+    const status = document.getElementById("dataStatus");
+    if (status) status.textContent = "Live ESPN";
+
+    console.log("Live roster loaded:", state.roster);
   })
   .catch(err => console.error("ESPN dashboard connection failed:", err));
+
 
 </script>
 </body></html>
