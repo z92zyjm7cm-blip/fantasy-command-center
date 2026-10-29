@@ -106,9 +106,18 @@ function importData(e){const file=e.target.files[0];if(!file)return;const reader
 function resetData(){if(confirm("Reset all local roster, matchup and waiver data on this device? Export a backup first if needed.")){localStorage.removeItem(KEY);state=load();renderAll()}}
 function renderAll(){renderHome();renderRoster();renderCategories();renderWaivers()}
 renderAll();
-  fetch("https://fantasy-command-center-api.z92zyjm7cm.workers.dev/")
-  .then(r => r.json())
-  .then(data => console.log("Worker reachable:", data))
-  .catch(err => console.error("Worker connection failed:", err));
+
+fetch("https://fantasy-command-center-api.z92zyjm7cm.workers.dev/api/dashboard")
+  .then(r => {
+    if (!r.ok) throw new Error("Dashboard request failed: " + r.status);
+    return r.json();
+  })
+  .then(data => {
+    console.log("Live ESPN dashboard response:", data);
+    console.log("Available team names:", (data.teams || []).map(t => t.name));
+    console.log("Available team abbreviations:", (data.teams || []).map(t => t.abbreviation));
+  })
+  .catch(err => console.error("ESPN dashboard connection failed:", err));
+
 </script>
 </body></html>
