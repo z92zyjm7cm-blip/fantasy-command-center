@@ -88,7 +88,57 @@ function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
 function showView(v){document.querySelectorAll("main section").forEach(s=>s.classList.add("hidden"));document.getElementById("view-"+v).classList.remove("hidden");document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.view===v));window.scrollTo({top:0,behavior:"smooth"});if(v==="roster")renderRoster();if(v==="waivers")renderWaivers()}
 document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>showView(t.dataset.view)));
 function renderHome(){document.getElementById("rosterCount").textContent=state.roster.length;document.getElementById("rosterPreview").innerHTML=state.roster.slice(0,5).map(p=>`<div class="row"><div><div class="item-title">${esc(p.name)}</div><div class="small">${esc(p.slot)} · ${esc(p.team)}</div></div><span class="badge ${p.status==="Active"?"green":p.status==="Out"?"red":"gold"}">${esc(p.status)}</span></div>`).join("");const tasks=[["Refresh injury statuses","Update roster statuses before lineup lock."],["Check schedule density","Enter remaining games for your players."],["Review category targets","Use matchup notes to identify close categories."],["Save waiver moves","Use claims where they can swing a category."]];document.getElementById("checklist").innerHTML=tasks.map(([a,b],i)=>`<label class="row" style="align-items:flex-start;justify-content:flex-start"><input type="checkbox" ${state.checklist[i]?"checked":""} onchange="state.checklist[${i}]=this.checked;save()" style="margin-top:4px"><span><strong>${a}</strong><div class="small">${b}</div></span></label>`).join("")}
-function renderRoster(){const q=(document.getElementById("rosterSearch")?.value||"").toLowerCase();const list=state.roster.filter(p=>(p.name+" "+p.team+" "+p.slot).toLowerCase().includes(q));document.getElementById("rosterList").innerHTML=list.map(p=>{const i=state.roster.indexOf(p);return `<div class="item"><div class="row"><div><div class="item-title">${esc(p.name)}</div><div class="small">${esc(p.team)} · ${esc(p.pos)} · slot ${esc(p.slot)}</div></div><span class="badge ${p.status==="Active"?"green":p.status==="Out"?"red":"gold"}">${esc(p.status)}</span></div><div class="row" style="margin-top:10px"><div class="small">${Number(p.games)||0} games remaining</div><div style="display:flex;gap:6px"><button class="btn secondary" onclick="editPlayer(${i})">Edit</button><button class="btn ghost" onclick="removePlayer(${i})">Remove</button></div></div>${p.notes?`<div class="small" style="margin-top:7px">${esc(p.notes)}</div>`:""}</div>`}).join("")||`<div class="empty">No players match.</div>`;renderSchedule()}
+
+function renderRoster() {
+  const q = (document.getElementById("rosterSearch")?.value || "").toLowerCase();
+
+  const slotNames = {
+    "0": "PG",
+    "1": "SG",
+    "2": "SF",
+    "3": "PF",
+    "4": "C",
+    "5": "G",
+    "6": "F",
+    "11": "UTIL",
+    "12": "Bench",
+    "13": "IR"
+  };
+
+  const list = state.roster
+    .filter(p => (p.name + " " + p.pos + " " + p.slot).toLowerCase().includes(q))
+    .sort((a, b) => Number(a.slot) - Number(b.slot));
+
+  document.getElementById("rosterList").innerHTML = list.map(p => {
+    const i = state.roster.indexOf(p);
+    const slot = String(p.slot ?? "");
+    const slotLabel = slotNames[slot] || slot || "Unknown";
+    const status = slot === "13" ? "IR" : (p.status || "Unknown");
+    const badgeClass = status === "Active" ? "green" :
+      status === "Out" ? "red" : "gold";
+
+    return `<div class="item">
+      <div class="row">
+        <div>
+          <div class="item-title">${esc(p.name)}</div>
+          <div class="small">${esc(p.pos || "Unknown")} · ${esc(slotLabel)}</div>
+        </div>
+        <span class="badge ${badgeClass}">${esc(status)}</span>
+      </div>
+      <div class="small" style="margin-top:10px">
+        ${Number(p.games) > 0 ? Number(p.games) + " games remaining" : "Schedule not loaded"}
+      </div>
+      <div style="display:flex;gap:6px;margin-top:10px">
+        <button class="btn secondary" onclick="editPlayer(${i})">Edit</button>
+        <button class="btn secondary" onclick="removePlayer(${i})">Remove</button>
+      </div>
+      ${p.notes ? `<div class="small" style="margin-top:7px">${esc(p.notes)}</div>` : ""}
+    </div>`;
+  }).join("") || '<div class="empty">No players match.</div>';
+
+  renderSchedule();
+}
+
 function addPlayer(){const name=document.getElementById("pName").value.trim();if(!name){alert("Enter a player name.");return}state.roster.push({name,slot:document.getElementById("pSlot").value,team:document.getElementById("pTeam").value.trim().toUpperCase(),pos:document.getElementById("pPos").value.trim(),games:Number(document.getElementById("pGames").value)||0,status:document.getElementById("pStatus").value,notes:""});["pName","pTeam","pPos"].forEach(id=>document.getElementById(id).value="");save();renderRoster()}
 function editPlayer(i){const p=state.roster[i];const name=prompt("Player name",p.name);if(name===null)return;const slot=prompt("Roster slot",p.slot);if(slot===null)return;const team=prompt("NBA team",p.team);if(team===null)return;const pos=prompt("Eligible positions",p.pos);if(pos===null)return;const games=prompt("Games remaining this matchup",p.games);if(games===null)return;const status=prompt("Status: Unknown, Active, Questionable, Doubtful, Out, IR",p.status);if(status===null)return;Object.assign(p,{name:name.trim(),slot:slot.trim().toUpperCase(),team:team.trim().toUpperCase(),pos:pos.trim(),games:Number(games)||0,status:status.trim()});save();renderRoster()}
 function removePlayer(i){if(confirm("Remove "+state.roster[i].name+" from your local roster reference?")){state.roster.splice(i,1);save();renderRoster()}}
