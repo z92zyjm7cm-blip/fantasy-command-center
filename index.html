@@ -185,6 +185,7 @@ fetch("https://fantasy-command-center-api.z92zyjm7cm.workers.dev/api/dashboard")
     state.roster = team.roster.map(p => ({
       name: p.name,
       team: team.abbreviation || team.name,
+      nbaTeamId: p.player?.proTeamId ?? null,
       pos: positionNames[p.position] || "Unknown",
       slot: String(p.lineupSlotId ?? ""),
       status: /OUT|INJURED/i.test(p.injuryStatus || "")
