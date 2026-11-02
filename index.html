@@ -196,17 +196,12 @@ async function loadPlayerSchedules(){
     });
 
     
-  }catch(error){
+    }catch(error){
     console.error(error);
     alert("Schedule loading failed: "+error.message);
   }
 }
 
-    
-
-  save();
-  alert("Player schedules loaded successfully!");
-}
 function renderSchedule(){const sorted=[...state.roster].sort((a,b)=>(Number(b.games)||0)-(Number(a.games)||0));document.getElementById("scheduleSummary").innerHTML=sorted.slice(0,5).map(p=>`<div class="row"><span>${esc(p.name)}</span><span class="badge ${Number(p.games)>=4?"green":Number(p.games)<=1?"gold":""}">${Number(p.games)||0} games</span></div>`).join("")||`<div class="empty">Add schedule data on the Roster tab.</div>`}
 
 function saveMatchup(){
