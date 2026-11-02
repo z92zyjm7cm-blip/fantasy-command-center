@@ -30,9 +30,21 @@
 </section>
 <section id="view-matchup" class="hidden">
 <div class="hero"><span class="badge">WEEKLY MATCHUP</span><h1>Build your game plan</h1><p>Enter current category standings or opponent data to turn the report into targeted advice.</p></div>
-<div class="card"><div class="formgrid"><div class="field"><label>Matchup week / dates</label><input id="weekLabel" placeholder="e.g. Oct 19–25"></div><div class="field"><label>Opponent team</label><input id="opponentName" placeholder="Opponent name"></div></div><div class="field"><label>Matchup notes / opponent strengths</label><textarea id="matchupNotes" placeholder="Paste matchup standings, opponent roster, or notes from ESPN..."></textarea></div><button class="btn" onclick="saveMatchup()">Save matchup notes</button></div>
+<div class="card"><div class="formgrid">
+<div class="field">
+<label>Matchup start date</label>
+<input id="weekStart" type="date">
+</div>
+<div class="field">
+<label>Matchup end date</label>
+<input id="weekEnd" type="date">
+</div>
+<div class="field"><label>Opponent team</label><input id="opponentName" placeholder="Opponent name"></div></div><div class="field"><label>Matchup notes / opponent strengths</label><textarea id="matchupNotes" placeholder="Paste matchup standings, opponent roster, or notes from ESPN..."></textarea></div><button class="btn" onclick="saveMatchup()">Save matchup notes</button></div>
 <div class="section-title">Category battle plan</div><div class="tablewrap"><table><thead><tr><th>Category</th><th>Your status</th><th>Target</th><th>Notes</th></tr></thead><tbody id="categoryRows"></tbody></table></div>
-<div class="section-title">Schedule edge</div><div class="card"><p class="small">Enter remaining games for your roster on the Roster tab. More games help, but only if players are active and your lineup has open slots.</p><div id="scheduleSummary" class="stack"></div></div>
+<div class="section-title">Schedule edge</div><div class="card"><p class="small">Enter remaining games for your roster on the Roster tab. More games help, but only if players are active and your lineup has open slots.</p>
+<button class="btn secondary" onclick="loadPlayerSchedules()">Load NBA Schedules</button>
+<div id="scheduleSummary" class="stack"></div>
+</div>
 </section>
 <section id="view-roster" class="hidden">
 <div class="hero"><span class="badge">ROSTER ROOM</span><h1>Players & schedule</h1><p>Keep your roster and weekly availability in one place. Use the edit action to update roles and remaining games.</p></div>
@@ -82,7 +94,7 @@ const initialRoster=[
 ];
 const categories=["FG%","FT%","3PM","REB","AST","STL","BLK","TO","PTS"];
 let state=load();
-function load(){try{const x=JSON.parse(localStorage.getItem(KEY));if(x)return x}catch(e){}return {roster:initialRoster,waivers:[],checklist:{},matchup:{week:"",opponent:"",notes:""},categories:{}}}
+function load(){try{const x=JSON.parse(localStorage.getItem(KEY));if(x){x.matchup=x.matchup||{};x.matchup.startDate=x.matchup.startDate||"";x.matchup.endDate=x.matchup.endDate||"";return x}}catch(e){}return {roster:initialRoster,waivers:[],checklist:{},matchup:{week:"",startDate:"",endDate:"",opponent:"",notes:""},categories:{}}}
 function save(){localStorage.setItem(KEY,JSON.stringify(state));renderAll()}
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function showView(v){document.querySelectorAll("main section").forEach(s=>s.classList.add("hidden"));document.getElementById("view-"+v).classList.remove("hidden");document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.view===v));window.scrollTo({top:0,behavior:"smooth"});if(v==="roster")renderRoster();if(v==="waivers")renderWaivers()}
@@ -142,9 +154,80 @@ function renderRoster() {
 function addPlayer(){const name=document.getElementById("pName").value.trim();if(!name){alert("Enter a player name.");return}state.roster.push({name,slot:document.getElementById("pSlot").value,team:document.getElementById("pTeam").value.trim().toUpperCase(),pos:document.getElementById("pPos").value.trim(),games:Number(document.getElementById("pGames").value)||0,status:document.getElementById("pStatus").value,notes:""});["pName","pTeam","pPos"].forEach(id=>document.getElementById(id).value="");save();renderRoster()}
 function editPlayer(i){const p=state.roster[i];const name=prompt("Player name",p.name);if(name===null)return;const slot=prompt("Roster slot",p.slot);if(slot===null)return;const team=prompt("NBA team",p.team);if(team===null)return;const pos=prompt("Eligible positions",p.pos);if(pos===null)return;const games=prompt("Games remaining this matchup",p.games);if(games===null)return;const status=prompt("Status: Unknown, Active, Questionable, Doubtful, Out, IR",p.status);if(status===null)return;Object.assign(p,{name:name.trim(),slot:slot.trim().toUpperCase(),team:team.trim().toUpperCase(),pos:pos.trim(),games:Number(games)||0,status:status.trim()});save();renderRoster()}
 function removePlayer(i){if(confirm("Remove "+state.roster[i].name+" from your local roster reference?")){state.roster.splice(i,1);save();renderRoster()}}
+
+
+async function loadPlayerSchedules(){
+  try{
+    const start=state.matchup.startDate;
+    const end=state.matchup.endDate;
+
+    if(!start||!end||start>end){
+      alert("Please enter valid matchup start and end dates.");
+      return;
+    }
+
+    const gamesByTeam={};
+    let cursor=start;
+
+    while(cursor<=end){
+      const date=cursor.replaceAll("-","");
+      const res=await fetch(
+        `https://fantasy-command-center-api.z92zyjm7cm.workers.dev/api/schedule?date=${date}`
+      );
+
+      if(!res.ok)throw new Error(`Schedule API error: ${res.status}`);
+
+      const data=await res.json();
+      if(data.status!=="success")throw new Error("Invalid schedule response");
+
+      for(const event of data.events||[]){
+        for(const c of event.competitions?.[0]?.competitors||[]){
+          const id=Number(c.team?.id);
+          if(id)gamesByTeam[id]=(gamesByTeam[id]||0)+1;
+        }
+      }
+
+      const [y,m,d]=cursor.split("-").map(Number);
+      cursor=new Date(Date.UTC(y,m-1,d+1)).toISOString().slice(0,10);
+    }
+
+    state.roster.forEach(p=>{
+      p.games=gamesByTeam[Number(p.nbaTeamId)]||0;
+    });
+
+    save();
+    alert("Player schedules loaded successfully!");
+  }catch(error){
+    console.error(error);
+    alert("Schedule loading failed: "+error.message);
+  }
+}
+
+    
+
+  save();
+  alert("Player schedules loaded successfully!");
+}
 function renderSchedule(){const sorted=[...state.roster].sort((a,b)=>(Number(b.games)||0)-(Number(a.games)||0));document.getElementById("scheduleSummary").innerHTML=sorted.slice(0,5).map(p=>`<div class="row"><span>${esc(p.name)}</span><span class="badge ${Number(p.games)>=4?"green":Number(p.games)<=1?"gold":""}">${Number(p.games)||0} games</span></div>`).join("")||`<div class="empty">Add schedule data on the Roster tab.</div>`}
-function saveMatchup(){state.matchup={week:document.getElementById("weekLabel").value,opponent:document.getElementById("opponentName").value,notes:document.getElementById("matchupNotes").value};save();alert("Matchup notes saved on this device.")}
-function renderCategories(){document.getElementById("categoryRows").innerHTML=categories.map(c=>{const x=state.categories[c]||{status:"Toss-up",target:"Compete",notes:""};return `<tr><td><strong>${c}</strong>${c==="TO"?' <span class="small">(lower wins)</span>':""}</td><td><select onchange="setCat('${c}','status',this.value)">${["Strong","Toss-up","Weak","Ignore"].map(v=>`<option ${x.status===v?"selected":""}>${v}</option>`).join("")}</select></td><td><select onchange="setCat('${c}','target',this.value)">${["Prioritize","Compete","Punt"].map(v=>`<option ${x.target===v?"selected":""}>${v}</option>`).join("")}</select></td><td><input value="${esc(x.notes)}" placeholder="Notes" onchange="setCat('${c}','notes',this.value)" style="width:130px;background:#10151d;color:white;border:1px solid var(--line);padding:7px;border-radius:8px"></td></tr>`}).join("");document.getElementById("weekLabel").value=state.matchup.week||"";document.getElementById("opponentName").value=state.matchup.opponent||"";document.getElementById("matchupNotes").value=state.matchup.notes||""}
+
+function saveMatchup(){
+  const start=document.getElementById("weekStart").value;
+  const end=document.getElementById("weekEnd").value;
+
+  state.matchup={
+    week:start&&end?`${start} – ${end}`:"",
+    startDate:start,
+    endDate:end,
+    opponent:document.getElementById("opponentName").value,
+    notes:document.getElementById("matchupNotes").value
+  };
+
+  save();
+  alert("Matchup notes saved on this device.");
+}
+
+function renderCategories(){document.getElementById("categoryRows").innerHTML=categories.map(c=>{const x=state.categories[c]||{status:"Toss-up",target:"Compete",notes:""};return `<tr><td><strong>${c}</strong>${c==="TO"?' <span class="small">(lower wins)</span>':""}</td><td><select onchange="setCat('${c}','status',this.value)">${["Strong","Toss-up","Weak","Ignore"].map(v=>`<option ${x.status===v?"selected":""}>${v}</option>`).join("")}</select></td><td><select onchange="setCat('${c}','target',this.value)">${["Prioritize","Compete","Punt"].map(v=>`<option ${x.target===v?"selected":""}>${v}</option>`).join("")}</select></td><td><input value="${esc(x.notes)}" placeholder="Notes" onchange="setCat('${c}','notes',this.value)" style="width:130px;background:#10151d;color:white;border:1px solid var(--line);padding:7px;border-radius:8px"></td></tr>`}).join("");document.getElementById("weekStart").value=state.matchup.startDate||"";
+document.getElementById("weekEnd").value=state.matchup.endDate||"";||"";document.getElementById("opponentName").value=state.matchup.opponent||"";document.getElementById("matchupNotes").value=state.matchup.notes||""}
 function setCat(c,k,v){state.categories[c]=state.categories[c]||{status:"Toss-up",target:"Compete",notes:""};state.categories[c][k]=v;save()}
 function addWaiver(){const name=document.getElementById("wName").value.trim();if(!name){alert("Enter a player name.");return}state.waivers.push({name,team:document.getElementById("wTeam").value.trim().toUpperCase(),pos:document.getElementById("wPos").value.trim(),games:Number(document.getElementById("wGames").value)||0,minutes:Number(document.getElementById("wMin").value)||0,fit:document.getElementById("wFit").value,prod:Number(document.getElementById("wProd").value)||0,risk:Number(document.getElementById("wRisk").value)||0});["wName","wTeam","wPos"].forEach(id=>document.getElementById(id).value="");save();renderWaivers()}
 function waiverScore(p){const target=(state.categories[p.fit]?.target||"Compete");const fitBoost=target==="Prioritize"?4:target==="Punt"?-2:0;return (p.prod*2 + p.games*2 + Math.min(p.minutes,36)*.25 + fitBoost - p.risk*5)}
@@ -185,7 +268,7 @@ fetch("https://fantasy-command-center-api.z92zyjm7cm.workers.dev/api/dashboard")
     state.roster = team.roster.map(p => ({
       name: p.name,
       team: team.abbreviation || team.name,
-      nbaTeamId: p.player?.proTeamId ?? null,
+      nbaTeamId: p.nbaTeamId ?? null,
       pos: positionNames[p.position] || "Unknown",
       slot: String(p.lineupSlotId ?? ""),
       status: /OUT|INJURED/i.test(p.injuryStatus || "")
