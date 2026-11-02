@@ -195,8 +195,7 @@ async function loadPlayerSchedules(){
       p.games=gamesByTeam[Number(p.nbaTeamId)]||0;
     });
 
-    save();
-    alert("Player schedules loaded successfully!");
+    
   }catch(error){
     console.error(error);
     alert("Schedule loading failed: "+error.message);
@@ -227,7 +226,7 @@ function saveMatchup(){
 }
 
 function renderCategories(){document.getElementById("categoryRows").innerHTML=categories.map(c=>{const x=state.categories[c]||{status:"Toss-up",target:"Compete",notes:""};return `<tr><td><strong>${c}</strong>${c==="TO"?' <span class="small">(lower wins)</span>':""}</td><td><select onchange="setCat('${c}','status',this.value)">${["Strong","Toss-up","Weak","Ignore"].map(v=>`<option ${x.status===v?"selected":""}>${v}</option>`).join("")}</select></td><td><select onchange="setCat('${c}','target',this.value)">${["Prioritize","Compete","Punt"].map(v=>`<option ${x.target===v?"selected":""}>${v}</option>`).join("")}</select></td><td><input value="${esc(x.notes)}" placeholder="Notes" onchange="setCat('${c}','notes',this.value)" style="width:130px;background:#10151d;color:white;border:1px solid var(--line);padding:7px;border-radius:8px"></td></tr>`}).join("");document.getElementById("weekStart").value=state.matchup.startDate||"";
-document.getElementById("weekEnd").value=state.matchup.endDate||"";||"";document.getElementById("opponentName").value=state.matchup.opponent||"";document.getElementById("matchupNotes").value=state.matchup.notes||""}
+document.getElementById("weekEnd").value=state.matchup.endDate||"";document.getElementById("opponentName").value=state.matchup.opponent||"";document.getElementById("matchupNotes").value=state.matchup.notes||""}
 function setCat(c,k,v){state.categories[c]=state.categories[c]||{status:"Toss-up",target:"Compete",notes:""};state.categories[c][k]=v;save()}
 function addWaiver(){const name=document.getElementById("wName").value.trim();if(!name){alert("Enter a player name.");return}state.waivers.push({name,team:document.getElementById("wTeam").value.trim().toUpperCase(),pos:document.getElementById("wPos").value.trim(),games:Number(document.getElementById("wGames").value)||0,minutes:Number(document.getElementById("wMin").value)||0,fit:document.getElementById("wFit").value,prod:Number(document.getElementById("wProd").value)||0,risk:Number(document.getElementById("wRisk").value)||0});["wName","wTeam","wPos"].forEach(id=>document.getElementById(id).value="");save();renderWaivers()}
 function waiverScore(p){const target=(state.categories[p.fit]?.target||"Compete");const fitBoost=target==="Prioritize"?4:target==="Punt"?-2:0;return (p.prod*2 + p.games*2 + Math.min(p.minutes,36)*.25 + fitBoost - p.risk*5)}
