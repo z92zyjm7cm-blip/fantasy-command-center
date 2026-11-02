@@ -192,8 +192,11 @@ async function loadPlayerSchedules(){
     }
 
     state.roster.forEach(p=>{
-      p.games=gamesByTeam[Number(p.nbaTeamId)]||0;
-    });
+  p.games=gamesByTeam[Number(p.nbaTeamId)]||0;
+});
+
+save();
+alert("Player schedules loaded successfully!");
 
     
     }catch(error){
