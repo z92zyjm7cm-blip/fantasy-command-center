@@ -158,8 +158,8 @@ function removePlayer(i){if(confirm("Remove "+state.roster[i].name+" from your l
 
 async function loadPlayerSchedules(){
   try{
-    const start=state.matchup.startDate;
-    const end=state.matchup.endDate;
+   const start=state.matchup.startDate;
+const end=state.matchup.endDate;
 
     if(!start||!end||start>end){
       alert("Please enter valid matchup start and end dates.");
@@ -167,7 +167,7 @@ async function loadPlayerSchedules(){
     }
 
     const gamesByTeam={};
-    let cursor=start;
+let cursor=start;
 
     while(cursor<=end){
       const date=cursor.replaceAll("-","");
