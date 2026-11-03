@@ -156,18 +156,19 @@ function editPlayer(i){const p=state.roster[i];const name=prompt("Player name",p
 function removePlayer(i){if(confirm("Remove "+state.roster[i].name+" from your local roster reference?")){state.roster.splice(i,1);save();renderRoster()}}
 
 
+
 async function loadPlayerSchedules(){
   try{
-   const start=state.matchup.startDate;
-const end=state.matchup.endDate;
+    const start=state.matchup.startDate;
+    const end=state.matchup.endDate;
 
     if(!start||!end||start>end){
-      alert("Please enter valid matchup start and end dates.");
+      alert("Please save valid matchup dates first.");
       return;
     }
 
     const gamesByTeam={};
-let cursor=start;
+    let cursor=start;
 
     while(cursor<=end){
       const date=cursor.replaceAll("-","");
@@ -175,28 +176,29 @@ let cursor=start;
         `https://fantasy-command-center-api.z92zyjm7cm.workers.dev/api/schedule?date=${date}`
       );
 
-      if(!res.ok)throw new Error(`Schedule API error: ${res.status}`);
+      if(!res.ok)throw new Error("Schedule API error");
 
       const data=await res.json();
-      if(data.status!=="success")throw new Error("Invalid schedule response");
 
       for(const event of data.events||[]){
         for(const c of event.competitions?.[0]?.competitors||[]){
-          const id=Number(c.team?.id);
-          if(id)gamesByTeam[id]=(gamesByTeam[id]||0)+1;
+          const abbr=c.team?.abbreviation;
+          if(abbr)gamesByTeam[abbr]=(gamesByTeam[abbr]||0)+1;
         }
       }
 
       const [y,m,d]=cursor.split("-").map(Number);
-      cursor=new Date(Date.UTC(y,m-1,d+1)).toISOString().slice(0,10);
+      cursor=new Date(Date.UTC(y,m-1,d+1))
+        .toISOString().slice(0,10);
     }
 
     state.roster.forEach(p=>{
-  p.games=gamesByTeam[Number(p.nbaTeamId)]||0;
-});
-save();
-alert("Player schedules loaded successfully!");
-    }catch(error){
+      p.games=gamesByTeam[p.nbaTeamAbbreviation]||0;
+    });
+
+    save();
+    alert("Player schedules loaded successfully!");
+  }catch(error){
     console.error(error);
     alert("Schedule loading failed: "+error.message);
   }
@@ -258,7 +260,7 @@ if (!opponent || !opponent.roster) {
 
 state.opponentRoster = opponent.roster.map(p => ({
   name: p.name,
-  nbaTeamId: p.nbaTeamId ?? null,
+  nbaTeamAbbreviation: p.nbaTeamAbbreviation ?? null,
   status: /OUT|INJURED/i.test(p.injuryStatus || "")
     ? "Out"
     : (p.injuryStatus === "NORMAL" ? "Active" : "Unknown"),
