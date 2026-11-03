@@ -194,11 +194,8 @@ let cursor=start;
     state.roster.forEach(p=>{
   p.games=gamesByTeam[Number(p.nbaTeamId)]||0;
 });
-
 save();
 alert("Player schedules loaded successfully!");
-
-    
     }catch(error){
     console.error(error);
     alert("Schedule loading failed: "+error.message);
