@@ -250,7 +250,20 @@ fetch("https://fantasy-command-center-api.z92zyjm7cm.workers.dev/api/dashboard")
     if (!team || !team.roster) {
       throw new Error("Could not find the gold team's roster.");
     }
+const opponent = data.teams.find(t => t.id !== team.id);
 
+if (!opponent || !opponent.roster) {
+  throw new Error("Could not find opponent roster.");
+}
+
+state.opponentRoster = opponent.roster.map(p => ({
+  name: p.name,
+  nbaTeamId: p.nbaTeamId ?? null,
+  status: /OUT|INJURED/i.test(p.injuryStatus || "")
+    ? "Out"
+    : (p.injuryStatus === "NORMAL" ? "Active" : "Unknown"),
+  games: 0
+}));
     const positionNames = {
       1: "PG",
       2: "SG",
