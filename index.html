@@ -233,6 +233,7 @@ function saveMatchup(){
 
 
 
+
 async function loadLiveMatchup(){
   const el=document.getElementById("liveMatchup");
   if(!el)return;
@@ -259,13 +260,8 @@ async function loadLiveMatchup(){
 
     const goldIsHome=Number(home.teamId)===Number(g.id);
 
-    const goldScore=goldIsHome
-  ? home.totalPoints
-  : away.totalPoints;
-
-const oppScore=goldIsHome
-  ? away.totalPoints
-  : home.totalPoints;
+    const goldScore=goldIsHome?home.cumulativeScore:away.cumulativeScore;
+    const oppScore=goldIsHome?away.cumulativeScore:home.cumulativeScore;
 
     el.innerHTML=`
       <div class="card">
@@ -273,12 +269,12 @@ const oppScore=goldIsHome
         <h2>${esc(g.name)} vs ${esc(o.name)}</h2>
         <div class="grid">
           <div>
-            <div class="small">GOLD</div>
-            <h1>${Number(goldScore||0).toFixed(1)}</h1>
+            <div class="small">GOLD (W-L-T)</div>
+            <h1>${goldScore?.wins??0}-${goldScore?.losses??0}-${goldScore?.ties??0}</h1>
           </div>
           <div>
-            <div class="small">OPPONENT</div>
-            <h1>${Number(oppScore||0).toFixed(1)}</h1>
+            <div class="small">OPPONENT (W-L-T)</div>
+            <h1>${oppScore?.wins??0}-${oppScore?.losses??0}-${oppScore?.ties??0}</h1>
           </div>
         </div>
         <div class="small">Live ESPN matchup data</div>
