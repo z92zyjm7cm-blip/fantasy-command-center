@@ -232,6 +232,7 @@ function saveMatchup(){
 }
 
 
+
 async function loadLiveMatchup(){
   const el=document.getElementById("liveMatchup");
   if(!el)return;
@@ -257,8 +258,14 @@ async function loadLiveMatchup(){
     const away=m.away;
 
     const goldIsHome=Number(home.teamId)===Number(g.id);
-    const goldScore=goldIsHome?home.totalPoints:away.totalPoints;
-    const oppScore=goldIsHome?away.totalPoints:home.totalPoints;
+
+    const goldScore=goldIsHome
+      ? home.cumulativeScore
+      : away.cumulativeScore;
+
+    const oppScore=goldIsHome
+      ? away.cumulativeScore
+      : home.cumulativeScore;
 
     el.innerHTML=`
       <div class="card">
@@ -281,6 +288,7 @@ async function loadLiveMatchup(){
     el.innerHTML=`<div class="notice">Unable to load matchup: ${esc(error.message)}</div>`;
   }
 }
+
 
   function renderCategories(){document.getElementById("categoryRows").innerHTML=categories.map(c=>{const x=state.categories[c]||{status:"Toss-up",target:"Compete",notes:""};return `<tr><td><strong>${c}</strong>${c==="TO"?' <span class="small">(lower wins)</span>':""}</td><td><select onchange="setCat('${c}','status',this.value)">${["Strong","Toss-up","Weak","Ignore"].map(v=>`<option ${x.status===v?"selected":""}>${v}</option>`).join("")}</select></td><td><select onchange="setCat('${c}','target',this.value)">${["Prioritize","Compete","Punt"].map(v=>`<option ${x.target===v?"selected":""}>${v}</option>`).join("")}</select></td><td><input value="${esc(x.notes)}" placeholder="Notes" onchange="setCat('${c}','notes',this.value)" style="width:130px;background:#10151d;color:white;border:1px solid var(--line);padding:7px;border-radius:8px"></td></tr>`}).join("");document.getElementById("weekStart").value=state.matchup.startDate||"";
 document.getElementById("weekEnd").value=state.matchup.endDate||"";document.getElementById("opponentName").value=state.matchup.opponent||"";document.getElementById("matchupNotes").value=state.matchup.notes||""}
