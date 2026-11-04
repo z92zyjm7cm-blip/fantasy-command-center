@@ -260,12 +260,12 @@ async function loadLiveMatchup(){
     const goldIsHome=Number(home.teamId)===Number(g.id);
 
     const goldScore=goldIsHome
-      ? home.cumulativeScore
-      : away.cumulativeScore;
+  ? home.totalPoints
+  : away.totalPoints;
 
-    const oppScore=goldIsHome
-      ? away.cumulativeScore
-      : home.cumulativeScore;
+const oppScore=goldIsHome
+  ? away.totalPoints
+  : home.totalPoints;
 
     el.innerHTML=`
       <div class="card">
