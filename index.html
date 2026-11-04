@@ -30,6 +30,15 @@
 </section>
 <section id="view-matchup" class="hidden">
 <div class="hero"><span class="badge">WEEKLY MATCHUP</span><h1>Build your game plan</h1><p>Enter current category standings or opponent data to turn the report into targeted advice.</p></div>
+  
+<div class="section-title">Live ESPN Matchup</div>
+<div class="card">
+  <div id="liveMatchup" class="stack">
+    <div class="empty">Loading live matchup...</div>
+  </div>
+  <button class="btn secondary" onclick="loadLiveMatchup()">Refresh Live Matchup</button>
+</div>
+
 <div class="card"><div class="formgrid">
 <div class="field">
 <label>Matchup start date</label>
@@ -222,7 +231,58 @@ function saveMatchup(){
   alert("Matchup notes saved on this device.");
 }
 
-function renderCategories(){document.getElementById("categoryRows").innerHTML=categories.map(c=>{const x=state.categories[c]||{status:"Toss-up",target:"Compete",notes:""};return `<tr><td><strong>${c}</strong>${c==="TO"?' <span class="small">(lower wins)</span>':""}</td><td><select onchange="setCat('${c}','status',this.value)">${["Strong","Toss-up","Weak","Ignore"].map(v=>`<option ${x.status===v?"selected":""}>${v}</option>`).join("")}</select></td><td><select onchange="setCat('${c}','target',this.value)">${["Prioritize","Compete","Punt"].map(v=>`<option ${x.target===v?"selected":""}>${v}</option>`).join("")}</select></td><td><input value="${esc(x.notes)}" placeholder="Notes" onchange="setCat('${c}','notes',this.value)" style="width:130px;background:#10151d;color:white;border:1px solid var(--line);padding:7px;border-radius:8px"></td></tr>`}).join("");document.getElementById("weekStart").value=state.matchup.startDate||"";
+
+async function loadLiveMatchup(){
+  const el=document.getElementById("liveMatchup");
+  if(!el)return;
+
+  el.innerHTML='<div class="empty">Loading live matchup...</div>';
+
+  try{
+    const res=await fetch(
+      "https://fantasy-command-center-api.z92zyjm7cm.workers.dev/api/matchup"
+    );
+
+    if(!res.ok)throw new Error("Matchup API error: "+res.status);
+
+    const data=await res.json();
+
+    if(data.status!=="success")throw new Error(data.error||"Invalid matchup data");
+
+    const g=data.goldTeam;
+    const o=data.opponent;
+    const m=data.matchup;
+
+    const home=m.home;
+    const away=m.away;
+
+    const goldIsHome=Number(home.teamId)===Number(g.id);
+    const goldScore=goldIsHome?home.totalPoints:away.totalPoints;
+    const oppScore=goldIsHome?away.totalPoints:home.totalPoints;
+
+    el.innerHTML=`
+      <div class="card">
+        <div class="small">MATCHUP PERIOD ${data.period}</div>
+        <h2>${esc(g.name)} vs ${esc(o.name)}</h2>
+        <div class="grid">
+          <div>
+            <div class="small">GOLD</div>
+            <h1>${Number(goldScore||0).toFixed(1)}</h1>
+          </div>
+          <div>
+            <div class="small">OPPONENT</div>
+            <h1>${Number(oppScore||0).toFixed(1)}</h1>
+          </div>
+        </div>
+        <div class="small">Live ESPN matchup data</div>
+      </div>
+    `;
+  }catch(error){
+    el.innerHTML=`<div class="notice">Unable to load matchup: ${esc(error.message)}</div>`;
+  }
+}
+
+  function renderCategories(){document.getElementById("categoryRows").innerHTML=categories.map(c=>{const x=state.categories[c]||{status:"Toss-up",target:"Compete",notes:""};return `<tr><td><strong>${c}</strong>${c==="TO"?' <span class="small">(lower wins)</span>':""}</td><td><select onchange="setCat('${c}','status',this.value)">${["Strong","Toss-up","Weak","Ignore"].map(v=>`<option ${x.status===v?"selected":""}>${v}</option>`).join("")}</select></td><td><select onchange="setCat('${c}','target',this.value)">${["Prioritize","Compete","Punt"].map(v=>`<option ${x.target===v?"selected":""}>${v}</option>`).join("")}</select></td><td><input value="${esc(x.notes)}" placeholder="Notes" onchange="setCat('${c}','notes',this.value)" style="width:130px;background:#10151d;color:white;border:1px solid var(--line);padding:7px;border-radius:8px"></td></tr>`}).join("");document.getElementById("weekStart").value=state.matchup.startDate||"";
 document.getElementById("weekEnd").value=state.matchup.endDate||"";document.getElementById("opponentName").value=state.matchup.opponent||"";document.getElementById("matchupNotes").value=state.matchup.notes||""}
 function setCat(c,k,v){state.categories[c]=state.categories[c]||{status:"Toss-up",target:"Compete",notes:""};state.categories[c][k]=v;save()}
 function addWaiver(){const name=document.getElementById("wName").value.trim();if(!name){alert("Enter a player name.");return}state.waivers.push({name,team:document.getElementById("wTeam").value.trim().toUpperCase(),pos:document.getElementById("wPos").value.trim(),games:Number(document.getElementById("wGames").value)||0,minutes:Number(document.getElementById("wMin").value)||0,fit:document.getElementById("wFit").value,prod:Number(document.getElementById("wProd").value)||0,risk:Number(document.getElementById("wRisk").value)||0});["wName","wTeam","wPos"].forEach(id=>document.getElementById(id).value="");save();renderWaivers()}
