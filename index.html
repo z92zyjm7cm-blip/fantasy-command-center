@@ -252,10 +252,10 @@ async function loadLiveMatchup(){
 
     if(data.status!=="success")throw new Error(data.error||"Invalid matchup data");
 
-    const g = data.goldTeam || {};
-const o = data.opponent || {};
+const g = data.goldTeam || {id:1,name:"Gold"};
+const o = data.opponent || {name:"Opponent"};
 const m = data.matchup || {};
-
+    
     const home=m.home;
     const away=m.away;
 
