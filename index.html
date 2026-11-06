@@ -303,7 +303,7 @@ const oppScore=goldIsHome?matchupAway.cumulativeScore:matchupHome.cumulativeScor
                   result==="LOSS"?"#ef4444":"#a6b0c0";
 
       return `
-        <div class="grid" style="align-items:center;padding:8px 0;border-bottom:1px solid var(--line)">
+        <div class="grid" style="grid-template-columns:1fr 1fr 1fr 1fr;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)">
           <div style="text-align:right;font-weight:600">${formatValue(c.id,gold)}</div>
           <div style="text-align:center;font-size:13px;color:var(--muted)">${c.name}</div>
           <div style="text-align:left;font-weight:600">${formatValue(c.id,opp)}</div>
