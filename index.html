@@ -259,7 +259,7 @@ async function loadLiveMatchup(){
     const home=m.home;
     const away=m.away;
 
-    const goldIsHome=Number(home.teamId)===Number(g.id);
+    const goldIsHome=Number(home.teamId)===Number(data.goldTeam?.teamId);
 
     const goldScore=goldIsHome?home.cumulativeScore:away.cumulativeScore;
     const oppScore=goldIsHome?away.cumulativeScore:home.cumulativeScore;
