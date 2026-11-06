@@ -252,14 +252,14 @@ async function loadLiveMatchup(){
 
     if(data.status!=="success")throw new Error(data.error||"Invalid matchup data");
 
-    const g=data.goldTeam;
-    const o=data.opponent;
-    const m=data.matchup;
+    const g = data.goldTeam || {};
+const o = data.opponent || {};
+const m = data.matchup || {};
 
     const home=m.home;
     const away=m.away;
 
-    const goldIsHome=Number(home.teamId)===Number(data.goldTeam?.teamId);
+    const goldIsHome=Number(home.teamId)===1;
 
     const goldScore=goldIsHome?home.cumulativeScore:away.cumulativeScore;
     const oppScore=goldIsHome?away.cumulativeScore:home.cumulativeScore;
