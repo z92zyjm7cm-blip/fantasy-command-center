@@ -234,6 +234,7 @@ function saveMatchup(){
 
 
 
+
 async function loadLiveMatchup(){
   const el=document.getElementById("liveMatchup");
   if(!el)return;
@@ -263,10 +264,52 @@ async function loadLiveMatchup(){
     const goldScore=goldIsHome?home.cumulativeScore:away.cumulativeScore;
     const oppScore=goldIsHome?away.cumulativeScore:home.cumulativeScore;
 
+    const goldStats=goldScore?.scoreByStat||{};
+    const oppStats=oppScore?.scoreByStat||{};
+
+    const categories=[
+      {id:19,name:"FG%",pct:true},
+      {id:20,name:"FT%",pct:true},
+      {id:11,name:"3PM"},
+      {id:6,name:"REB"},
+      {id:3,name:"AST"},
+      {id:1,name:"STL"},
+      {id:2,name:"BLK"},
+      {id:17,name:"TO"},
+      {id:0,name:"PTS"}
+    ];
+
+    const formatValue=(id,value)=>{
+      if(value==null)return "-";
+      if(id===19||id===20){
+        return (Number(value)*100).toFixed(1)+"%";
+      }
+      return Number(value).toLocaleString();
+    };
+
+    const categoryRows=categories.map(c=>{
+      const gold=goldStats[c.id]?.score;
+      const opp=oppStats[c.id]?.score;
+      const result=goldStats[c.id]?.result;
+
+      const color=result==="WIN"?"#22c55e":
+                  result==="LOSS"?"#ef4444":"#a6b0c0";
+
+      return `
+        <div class="grid" style="align-items:center;padding:8px 0;border-bottom:1px solid var(--line)">
+          <div style="text-align:right;font-weight:600">${formatValue(c.id,gold)}</div>
+          <div style="text-align:center;font-size:13px;color:var(--muted)">${c.name}</div>
+          <div style="text-align:left;font-weight:600">${formatValue(c.id,opp)}</div>
+          <div style="text-align:center;font-size:12px;color:${color}">${result||"-"}</div>
+        </div>
+      `;
+    }).join("");
+
     el.innerHTML=`
       <div class="card">
         <div class="small">MATCHUP PERIOD ${data.period}</div>
         <h2>${esc(g.name)} vs ${esc(o.name)}</h2>
+
         <div class="grid">
           <div>
             <div class="small">GOLD (W-L-T)</div>
@@ -277,7 +320,23 @@ async function loadLiveMatchup(){
             <h1>${oppScore?.wins??0}-${oppScore?.losses??0}-${oppScore?.ties??0}</h1>
           </div>
         </div>
-        <div class="small">Live ESPN matchup data</div>
+
+        <div class="small" style="margin-top:16px">
+          CATEGORY BREAKDOWN
+        </div>
+
+        <div class="grid" style="grid-template-columns:1fr 1fr 1fr 1fr;font-size:12px;color:var(--muted);padding:8px 0">
+          <div style="text-align:right">GOLD</div>
+          <div style="text-align:center">CATEGORY</div>
+          <div style="text-align:left">OPP</div>
+          <div style="text-align:center">RESULT</div>
+        </div>
+
+        ${categoryRows}
+
+        <div class="small" style="margin-top:12px">
+          Live ESPN matchup data
+        </div>
       </div>
     `;
   }catch(error){
