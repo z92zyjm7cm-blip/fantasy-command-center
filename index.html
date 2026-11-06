@@ -260,9 +260,16 @@ const m = data.matchup || {};
     const away=m.away;
 
     const goldIsHome=Number(home.teamId)===1;
+ 
 
-    const goldScore=goldIsHome?home.cumulativeScore:away.cumulativeScore;
-    const oppScore=goldIsHome?away.cumulativeScore:home.cumulativeScore;
+const scoreHome=data.scoreData?.home;
+const scoreAway=data.scoreData?.away;
+
+const matchupHome=data.matchup?.home;
+const matchupAway=data.matchup?.away;
+
+const goldScore=goldIsHome?matchupHome.cumulativeScore:matchupAway.cumulativeScore;
+const oppScore=goldIsHome?matchupAway.cumulativeScore:matchupHome.cumulativeScore;
 
     const goldStats=goldScore?.scoreByStat||{};
     const oppStats=oppScore?.scoreByStat||{};
