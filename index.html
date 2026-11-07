@@ -49,6 +49,12 @@
 <input id="weekEnd" type="date">
 </div>
 <div class="field"><label>Opponent team</label><input id="opponentName" placeholder="Opponent name"></div></div><div class="field"><label>Matchup notes / opponent strengths</label><textarea id="matchupNotes" placeholder="Paste matchup standings, opponent roster, or notes from ESPN..."></textarea></div><button class="btn" onclick="saveMatchup()">Save matchup notes</button></div>
+<div class="section-title">Matchup Intelligence</div>
+<div class="card">
+  <div id="matchupIntel" class="stack">
+    <div class="empty">Refresh live matchup to generate strategy.</div>
+  </div>
+</div>
 <div class="section-title">Category battle plan</div><div class="tablewrap"><table><thead><tr><th>Category</th><th>Your status</th><th>Target</th><th>Notes</th></tr></thead><tbody id="categoryRows"></tbody></table></div>
 <div class="section-title">Schedule edge</div><div class="card"><p class="small">Enter remaining games for your roster on the Roster tab. More games help, but only if players are active and your lineup has open slots.</p>
 <button class="btn secondary" onclick="loadPlayerSchedules()">Load NBA Schedules</button>
