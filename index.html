@@ -176,7 +176,7 @@ async function loadPlayerSchedules(){
       return;
     }
 
-    const gamesByTeam={};
+    const gamesByTeamId={};
     let cursor=start;
 
     while(cursor<=end){
@@ -190,11 +190,13 @@ async function loadPlayerSchedules(){
       const data=await res.json();
 
       for(const event of data.events||[]){
-        for(const c of event.competitions?.[0]?.competitors||[]){
-          const abbr=c.team?.abbreviation;
-          if(abbr)gamesByTeam[abbr]=(gamesByTeam[abbr]||0)+1;
-        }
-      }
+  for(const c of event.competitions?.[0]?.competitors||[]){
+    const teamId=c.team?.id;
+    if(teamId){
+      gamesByTeamId[teamId]=(gamesByTeamId[teamId]||0)+1;
+    }
+  }
+}
 
       const [y,m,d]=cursor.split("-").map(Number);
       cursor=new Date(Date.UTC(y,m-1,d+1))
@@ -202,8 +204,8 @@ async function loadPlayerSchedules(){
     }
 
     state.roster.forEach(p=>{
-      p.games=gamesByTeam[p.nbaTeamAbbreviation]||0;
-    });
+  p.games=gamesByTeamId[p.nbaTeamId]||0;
+});
 
     save();
     alert("Player schedules loaded successfully!");
