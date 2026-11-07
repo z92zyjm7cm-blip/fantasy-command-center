@@ -342,12 +342,12 @@ const matchupHome = data.matchup?.home;
 const matchupAway = data.matchup?.away;
 
 const goldScore = goldIsHome
-  ? matchupHome?.cumulativeScore
-  : matchupAway?.cumulativeScore;
+  ? data.scoreData?.home?.cumulativeScore
+  : data.scoreData?.away?.cumulativeScore;
 
 const oppScore = goldIsHome
-  ? matchupAway?.cumulativeScore
-  : matchupHome?.cumulativeScore;
+  ? data.scoreData?.away?.cumulativeScore
+  : data.scoreData?.home?.cumulativeScore;
 
 const goldStats = goldScore?.scoreByStat || {};
 const oppStats = oppScore?.scoreByStat || {};
