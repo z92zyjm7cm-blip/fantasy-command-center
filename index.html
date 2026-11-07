@@ -243,6 +243,73 @@ function saveMatchup(){
 
 
 
+function renderMatchupIntel(goldStats, oppStats) {
+  const el = document.getElementById("matchupIntel");
+  if (!el) return;
+
+  const cats = [
+    {id:19,name:"FG%",unit:"pct"},
+    {id:20,name:"FT%",unit:"pct"},
+    {id:11,name:"3PM"},
+    {id:6,name:"REB"},
+    {id:3,name:"AST"},
+    {id:1,name:"STL"},
+    {id:2,name:"BLK"},
+    {id:17,name:"TO"},
+    {id:0,name:"PTS"}
+  ];
+
+  const rows = cats.map(c => {
+    const g = goldStats[c.id]?.score;
+    const o = oppStats[c.id]?.score;
+    const result = goldStats[c.id]?.result;
+
+    if (g == null || o == null) {
+      return {
+        name:c.name,
+        action:"Monitor",
+        color:"gold",
+        reason:"Insufficient category data."
+      };
+    }
+
+    const gap = Math.abs(Number(g)-Number(o));
+    let action, color, reason;
+
+    if (result === "WIN") {
+      action = "Protect";
+      color = "green";
+      reason = "Currently leading. Avoid sacrificing this category unnecessarily.";
+    } else if (result === "LOSS") {
+      action = gap <= 3 ? "Attack" : "Monitor";
+      color = gap <= 3 ? "gold" : "red";
+      reason = gap <= 3
+        ? "Close deficit. Consider targeted games or category specialists."
+        : "Deficit is substantial. Evaluate whether recovery is realistic.";
+    } else {
+      action = "Monitor";
+      color = "gold";
+      reason = "Category is tied or unresolved. Reassess after more games.";
+    }
+
+    if (c.name === "TO" && result === "WIN") {
+      reason = "Lower turnovers are better. Protect this advantage.";
+    }
+
+    return {name:c.name,action,color,reason};
+  });
+
+  el.innerHTML = rows.map(r => `
+    <div class="item">
+      <div class="row">
+        <strong>${esc(r.name)}</strong>
+        <span class="badge ${r.color}">${esc(r.action)}</span>
+      </div>
+      <div class="small" style="margin-top:6px">${esc(r.reason)}</div>
+    </div>
+  `).join("");
+}
+
 async function loadLiveMatchup(){
   const el=document.getElementById("liveMatchup");
   if(!el)return;
@@ -276,11 +343,15 @@ const scoreAway=data.scoreData?.away;
 const matchupHome=data.matchup?.home;
 const matchupAway=data.matchup?.away;
 
-const goldScore=goldIsHome?matchupHome.cumulativeScore:matchupAway.cumulativeScore;
-const oppScore=goldIsHome?matchupAway.cumulativeScore:matchupHome.cumulativeScore;
+const liveHome = data.scoreData?.home?.cumulativeScore;
+const liveAway = data.scoreData?.away?.cumulativeScore;
 
-    const goldStats=goldScore?.scoreByStat||{};
-    const oppStats=oppScore?.scoreByStat||{};
+const goldScore = goldIsHome ? liveHome : liveAway;
+const oppScore = goldIsHome ? liveAway : liveHome;
+const goldStats = goldScore?.scoreByStat || {};
+const oppStats = oppScore?.scoreByStat || {};
+
+renderMatchupIntel(goldStats,oppStats);
 
     const categories=[
       {id:19,name:"FG%",pct:true},
