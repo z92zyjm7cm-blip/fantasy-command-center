@@ -346,11 +346,24 @@ const matchupAway=data.matchup?.away;
 const liveHome = data.scoreData?.home?.cumulativeScore;
 const liveAway = data.scoreData?.away?.cumulativeScore;
 
-const goldScore = goldIsHome ? liveHome : liveAway;
-const oppScore = goldIsHome ? liveAway : liveHome;
-const goldStats = goldScore?.scoreByStat || {};
-const oppStats = oppScore?.scoreByStat || {};
+const goldScore = goldIsHome
+  ? matchupHome.cumulativeScore
+  : matchupAway.cumulativeScore;
 
+const oppScore = goldIsHome
+  ? matchupAway.cumulativeScore
+  : matchupHome.cumulativeScore;
+
+const goldStatScore = goldIsHome
+  ? scoreHome
+  : scoreAway;
+
+const oppStatScore = goldIsHome
+  ? scoreAway
+  : scoreHome;
+
+const goldStats = goldStatScore?.scoreByStat || {};
+const oppStats = oppStatScore?.scoreByStat || {};
 renderMatchupIntel(goldStats,oppStats);
 
     const categories=[
