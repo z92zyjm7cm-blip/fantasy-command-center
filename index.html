@@ -337,34 +337,22 @@ const m = data.matchup || {};
     const goldIsHome=Number(home.teamId)===1;
  
 
-const scoreHome=data.scoreData?.home;
-const scoreAway=data.scoreData?.away;
 
-const matchupHome=data.matchup?.home;
-const matchupAway=data.matchup?.away;
-
-const liveHome = data.scoreData?.home?.cumulativeScore;
-const liveAway = data.scoreData?.away?.cumulativeScore;
+const matchupHome = data.matchup?.home;
+const matchupAway = data.matchup?.away;
 
 const goldScore = goldIsHome
-  ? matchupHome.cumulativeScore
-  : matchupAway.cumulativeScore;
+  ? matchupHome?.cumulativeScore
+  : matchupAway?.cumulativeScore;
 
 const oppScore = goldIsHome
-  ? matchupAway.cumulativeScore
-  : matchupHome.cumulativeScore;
+  ? matchupAway?.cumulativeScore
+  : matchupHome?.cumulativeScore;
 
-const goldStatScore = goldIsHome
-  ? scoreHome
-  : scoreAway;
+const goldStats = goldScore?.scoreByStat || {};
+const oppStats = oppScore?.scoreByStat || {};
 
-const oppStatScore = goldIsHome
-  ? scoreAway
-  : scoreHome;
-
-const goldStats = goldStatScore?.scoreByStat || {};
-const oppStats = oppStatScore?.scoreByStat || {};
-renderMatchupIntel(goldStats,oppStats);
+renderMatchupIntel(goldStats, oppStats);
 
     const categories=[
       {id:19,name:"FG%",pct:true},
