@@ -310,52 +310,65 @@ function renderMatchupIntel(goldStats, oppStats) {
   `).join("");
 }
 
+
 async function loadLiveMatchup(){
-  const el=document.getElementById("liveMatchup");
-  if(!el)return;
+  const el = document.getElementById("liveMatchup");
+  if (!el) return;
 
-  el.innerHTML='<div class="empty">Loading live matchup...</div>';
+  el.innerHTML = '<div class="empty">Loading live matchup...</div>';
 
-  try{
-    const res=await fetch(
-      "https://fantasy-command-center-api.z92zyjm7cm.workers.dev/api/matchup"
+  try {
+    const [matchupRes, dashboardRes] = await Promise.all([
+      fetch("https://fantasy-command-center-api.z92zyjm7cm.workers.dev/api/matchup"),
+      fetch("https://fantasy-command-center-api.z92zyjm7cm.workers.dev/api/dashboard")
+    ]);
+
+    if (!matchupRes.ok) throw new Error("Matchup API error: " + matchupRes.status);
+    if (!dashboardRes.ok) throw new Error("Dashboard API error: " + dashboardRes.status);
+
+    const data = await matchupRes.json();
+    const dashboard = await dashboardRes.json();
+
+    if (data.status !== "success") {
+      throw new Error(data.error || "Invalid matchup data");
+    }
+
+    const home = data.matchup?.home;
+    const away = data.matchup?.away;
+
+    if (!home || !away) throw new Error("Matchup sides missing");
+
+    const goldIsHome = Number(home.teamId) === 5;
+    const goldSide = goldIsHome ? home : away;
+    const oppSide = goldIsHome ? away : home;
+
+    // Correct source of category statistics
+    const goldStats =
+      goldSide.cumulativeScore?.scoreByStat || {};
+
+    const oppStats =
+      oppSide.cumulativeScore?.scoreByStat || {};
+
+    // Correct source of matchup W-L-T
+    const goldScore = goldSide.cumulativeScore || {};
+    const oppScore = oppSide.cumulativeScore || {};
+
+    // Resolve actual team names using live league data
+    const goldTeam = dashboard.teams?.find(
+      t => Number(t.id) === 5
     );
 
-    if(!res.ok)throw new Error("Matchup API error: "+res.status);
+    const opponentTeam = dashboard.teams?.find(
+      t => Number(t.id) === Number(oppSide.teamId)
+    );
 
-    const data=await res.json();
+    const goldName = goldTeam?.name || "Gold";
+    const opponentName = opponentTeam?.name || "Opponent";
 
-    if(data.status!=="success")throw new Error(data.error||"Invalid matchup data");
+    // Render category intelligence
+    renderMatchupIntel(goldStats, oppStats);
 
-const g = data.goldTeam || {id:1,name:"Gold"};
-const o = data.opponent || {name:"Opponent"};
-const m = data.matchup || {};
-    
-    const home=m.home;
-    const away=m.away;
-
-    
-const goldIsHome=Number(home.teamId)===5;
- 
-
-
-const matchupHome = data.matchup?.home;
-const matchupAway = data.matchup?.away;
-
-const goldScore = goldIsHome
-  ? data.scoreData?.home?.cumulativeScore
-  : data.scoreData?.away?.cumulativeScore;
-
-const oppScore = goldIsHome
-  ? data.scoreData?.away?.cumulativeScore
-  : data.scoreData?.home?.cumulativeScore;
-
-const goldStats = goldScore?.scoreByStat || {};
-const oppStats = oppScore?.scoreByStat || {};
-
-renderMatchupIntel(goldStats, oppStats);
-
-    const categories=[
+    const categories = [
       {id:19,name:"FG%",pct:true},
       {id:20,name:"FT%",pct:true},
       {id:11,name:"3PM"},
@@ -367,57 +380,94 @@ renderMatchupIntel(goldStats, oppStats);
       {id:0,name:"PTS"}
     ];
 
-    const formatValue=(id,value)=>{
-      if(value==null)return "-";
-      if(id===19||id===20){
+    const formatValue = (id,value) => {
+      if(value == null) return "-";
+
+      if(id === 19 || id === 20){
         return (Number(value)*100).toFixed(1)+"%";
       }
+
       return Number(value).toLocaleString();
     };
 
-    const categoryRows=categories.map(c=>{
-      const gold=goldStats[c.id]?.score;
-      const opp=oppStats[c.id]?.score;
-      const result=goldStats[c.id]?.result;
+    const categoryRows = categories.map(c => {
+      const gold = goldStats[c.id]?.score;
+      const opp = oppStats[c.id]?.score;
+      const result = goldStats[c.id]?.result;
 
-      const color=result==="WIN"?"#22c55e":
-                  result==="LOSS"?"#ef4444":"#a6b0c0";
+      const color = result === "WIN" ? "#22c55e" :
+                   result === "LOSS" ? "#ef4444" :
+                   "#a6b0c0";
 
       return `
-        <div class="grid" style="grid-template-columns:1fr 1fr 1fr 1fr;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)">
-          <div style="text-align:right;font-weight:600">${formatValue(c.id,gold)}</div>
-          <div style="text-align:center;font-size:13px;color:var(--muted)">${c.name}</div>
-          <div style="text-align:left;font-weight:600">${formatValue(c.id,opp)}</div>
-          <div style="text-align:center;font-size:12px;color:${color}">${result||"-"}</div>
+        <div class="grid"
+          style="grid-template-columns:1fr 1fr 1fr 1fr;
+          align-items:center;padding:8px 0;
+          border-bottom:1px solid var(--line)">
+
+          <div style="text-align:right;font-weight:600">
+            ${formatValue(c.id,gold)}
+          </div>
+
+          <div style="text-align:center;font-size:13px;color:var(--muted)">
+            ${c.name}
+          </div>
+
+          <div style="text-align:left;font-weight:600">
+            ${formatValue(c.id,opp)}
+          </div>
+
+          <div style="text-align:center;font-size:12px;color:${color}">
+            ${result || "-"}
+          </div>
         </div>
       `;
     }).join("");
 
-    el.innerHTML=`
+    el.innerHTML = `
       <div class="card">
-        <div class="small">MATCHUP PERIOD ${data.period}</div>
-        <h2>${esc(g.name)} vs ${esc(o.name)}</h2>
+
+        <div class="small">
+          MATCHUP PERIOD ${data.period}
+        </div>
+
+        <h2>${esc(goldName)} vs ${esc(opponentName)}</h2>
 
         <div class="grid">
+
           <div>
             <div class="small">GOLD (W-L-T)</div>
-            <h1>${goldScore?.wins??0}-${goldScore?.losses??0}-${goldScore?.ties??0}</h1>
+            <h1>
+              ${goldScore.wins ?? 0}-
+              ${goldScore.losses ?? 0}-
+              ${goldScore.ties ?? 0}
+            </h1>
           </div>
+
           <div>
             <div class="small">OPPONENT (W-L-T)</div>
-            <h1>${oppScore?.wins??0}-${oppScore?.losses??0}-${oppScore?.ties??0}</h1>
+            <h1>
+              ${oppScore.wins ?? 0}-
+              ${oppScore.losses ?? 0}-
+              ${oppScore.ties ?? 0}
+            </h1>
           </div>
+
         </div>
 
         <div class="small" style="margin-top:16px">
           CATEGORY BREAKDOWN
         </div>
 
-        <div class="grid" style="grid-template-columns:1fr 1fr 1fr 1fr;font-size:12px;color:var(--muted);padding:8px 0">
+        <div class="grid"
+          style="grid-template-columns:1fr 1fr 1fr 1fr;
+          font-size:12px;color:var(--muted);padding:8px 0">
+
           <div style="text-align:right">GOLD</div>
           <div style="text-align:center">CATEGORY</div>
           <div style="text-align:left">OPP</div>
           <div style="text-align:center">RESULT</div>
+
         </div>
 
         ${categoryRows}
@@ -425,10 +475,16 @@ renderMatchupIntel(goldStats, oppStats);
         <div class="small" style="margin-top:12px">
           Live ESPN matchup data
         </div>
+
       </div>
     `;
-  }catch(error){
-    el.innerHTML=`<div class="notice">Unable to load matchup: ${esc(error.message)}</div>`;
+
+  } catch(error) {
+    el.innerHTML = `
+      <div class="notice">
+        Unable to load matchup: ${esc(error.message)}
+      </div>
+    `;
   }
 }
 
