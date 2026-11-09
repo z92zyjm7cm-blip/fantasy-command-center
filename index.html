@@ -542,17 +542,17 @@ state.opponentRoster = opponent.roster.map(p => ({
     };
 
     state.roster = team.roster.map(p => ({
-      name: p.name,
-      team: team.abbreviation || team.name,
-      nbaTeamId: p.nbaTeamId ?? null,
-      pos: positionNames[p.position] || "Unknown",
-      slot: String(p.lineupSlotId ?? ""),
-      status: /OUT|INJURED/i.test(p.injuryStatus || "")
-        ? "Out"
-        : (p.injuryStatus === "NORMAL" ? "Active" : "Unknown"),
-      games: 0,
-      notes: ""
-    }));
+  name: p.name,
+  team: team.abbreviation || team.name,
+  nbaTeamId: p.nbaTeamId ?? null,
+  pos: positionNames[p.position] || "Unknown",
+  slot: String(p.lineupSlotId ?? ""),
+  status: /OUT|INJURED/i.test(p.injuryStatus || "")
+    ? "Out"
+    : (p.injuryStatus === "NORMAL" ? "Active" : "Unknown"),
+  games: 0,
+  notes: ""
+}));
 
     save();
 
