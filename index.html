@@ -243,13 +243,14 @@ function saveMatchup(){
 
 
 
+
 function renderMatchupIntel(goldStats, oppStats) {
   const el = document.getElementById("matchupIntel");
   if (!el) return;
 
   const cats = [
-    {id:19,name:"FG%",unit:"pct"},
-    {id:20,name:"FT%",unit:"pct"},
+    {id:19,name:"FG%"},
+    {id:20,name:"FT%"},
     {id:11,name:"3PM"},
     {id:6,name:"REB"},
     {id:3,name:"AST"},
@@ -267,11 +268,77 @@ function renderMatchupIntel(goldStats, oppStats) {
     if (g == null || o == null) {
       return {
         name:c.name,
-        action:"Monitor",
+        action:"MONITOR",
         color:"gold",
-        reason:"Insufficient category data."
+        reason:"Insufficient live category data."
       };
     }
+
+    const gap = Math.abs(Number(g) - Number(o));
+
+    let action, color, reason;
+
+    if (result === "WIN") {
+      action = "PROTECT";
+      color = "green";
+      reason = "Currently leading. Avoid sacrificing this category.";
+    } else if (result === "LOSS" && gap <= 3) {
+      action = "ATTACK";
+      color = "gold";
+      reason = "Close deficit. Prioritize players with games remaining.";
+    } else if (result === "LOSS") {
+      action = "MONITOR";
+      color = "red";
+      reason = "Deficit is substantial. Evaluate recovery potential.";
+    } else {
+      action = "MONITOR";
+      color = "gold";
+      reason = "Category result unavailable.";
+    }
+
+    return {name:c.name,action,color,reason,gap};
+  });
+
+  const protect = rows.filter(r => r.action === "PROTECT").length;
+  const attack = rows.filter(r => r.action === "ATTACK").length;
+  const monitor = rows.filter(r => r.action === "MONITOR").length;
+
+  el.innerHTML = `
+    <div class="card">
+      <div class="card-title">MATCHUP STRATEGY</div>
+
+      <div class="grid grid-3">
+        <div class="stat">
+          <div class="stat-label">PROTECT</div>
+          <div class="stat-value">${protect}</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">ATTACK</div>
+          <div class="stat-value">${attack}</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">MONITOR</div>
+          <div class="stat-value">${monitor}</div>
+        </div>
+      </div>
+
+      <div class="intel-list">
+        ${rows.map(r => `
+          <div class="intel-row">
+            <div class="intel-category">${r.name}</div>
+            <div class="intel-action ${r.color}">${r.action}</div>
+            <div class="intel-reason">${r.reason}</div>
+          </div>
+        `).join("")}
+      </div>
+
+      <div class="muted small">
+        Recommendations use current category results and score margins.
+        Remaining games and player projections are not yet factored in.
+      </div>
+    </div>
+  `;
+}
 
     const gap = Math.abs(Number(g)-Number(o));
     let action, color, reason;
