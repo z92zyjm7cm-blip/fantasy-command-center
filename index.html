@@ -19,7 +19,16 @@ button{cursor:pointer}
 .sub{color:var(--muted);font-size:13px}
 .pill{border:1px solid var(--line);border-radius:99px;padding:7px 10px;color:var(--muted);font-size:12px;white-space:nowrap}
 .tabs{display:flex;gap:8px;overflow:auto;padding:6px 0 14px;position:sticky;top:0;background:var(--bg);z-index:4}
-.tab{flex:0 0 auto;border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:12px;padding:10px 13px}
+.tab{
+  flex:0 0 auto;
+  border:1px solid var(--line);
+  background:var(--panel);
+  color:var(--muted);
+  border-radius:12px;
+  padding:10px 13px;
+  touch-action:manipulation;
+  pointer-events:auto;
+}
 .tab.active{background:#20344f;border-color:#3d78bd;color:white}
 .hero{background:linear-gradient(135deg,#1a2a40,#17202c 65%,#282316);border:1px solid #314258;border-radius:22px;padding:20px;margin:6px 0 16px}
 .hero h1{font-size:25px;line-height:1.15;margin:8px 0}
@@ -261,7 +270,29 @@ function loadState(){try{const x=JSON.parse(localStorage.getItem(KEY));if(x&&Arr
 function save(){localStorage.setItem(KEY,JSON.stringify(state));renderAll()}
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function showView(v){document.querySelectorAll("main section").forEach(s=>s.classList.add("hidden"));document.getElementById("view-"+v).classList.remove("hidden");document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.view===v));window.scrollTo({top:0,behavior:"smooth"});if(v==="roster")renderRoster();if(v==="waivers")renderWaivers()}
-document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>showView(t.dataset.view)));
+// Reliable navigation for mouse, touchscreen, and iPad
+document.querySelectorAll(".tab").forEach(button => {
+  button.addEventListener("click", function () {
+    showView(this.dataset.view);
+  });
+
+  button.addEventListener("pointerup", function (event) {
+    if (event.pointerType === "touch") {
+      showView(this.dataset.view);
+    }
+  });
+});
+
+// Make bottom navigation respond reliably too
+document.querySelectorAll(".navinner button").forEach((button, index) => {
+  const views = ["home", "matchup", "roster", "waivers", "trades"];
+
+  button.addEventListener("pointerup", function (event) {
+    if (event.pointerType === "touch") {
+      showView(views[index]);
+    }
+  });
+});
 function renderHome(){rosterCount.textContent=state.roster.length;rosterPreview.innerHTML=state.roster.slice(0,6).map(p=>`<div class="row"><div><strong>${esc(p.name)}</strong><div class="small">${esc(p.pos)} · ${esc(p.nbaTeamAbbreviation||"")}</div></div><span class="badge ${p.status==="Active"?"green":p.status==="Out"?"red":"gold"}">${esc(p.status||"Unknown")}</span></div>`).join("")||'<div class="empty">Tap Sync ESPN to load your roster.</div>';const tasks=[["Sync roster","Refresh ESPN roster and injury/status fields."],["Check daily lineup","Review player game times and active slots."],["Review category standings","Identify close categories and realistic targets."],["Use available moves wisely","Check schedules and category impact before adding."]];checklist.innerHTML=tasks.map(([a,b],i)=>`<label class="row" style="justify-content:flex-start;align-items:flex-start"><input type="checkbox" ${state.checklist[i]?"checked":""} onchange="state.checklist[${i}]=this.checked;save()" style="margin-top:4px"><span><strong>${a}</strong><div class="small">${b}</div></span></label>`).join("")}
 function renderRoster(){const q=(rosterSearch?.value||"").toLowerCase();const list=state.roster.filter(p=>(p.name+" "+p.pos+" "+p.slot).toLowerCase().includes(q));rosterList.innerHTML=list.map(p=>{const i=state.roster.indexOf(p);return `<div class="item"><div class="row"><div><strong>${esc(p.name)}</strong><div class="small">${esc(p.pos||"Unknown")} · ${esc(p.slot||"Unknown")} · ${esc(p.nbaTeamAbbreviation||"")}</div></div><span class="badge ${p.status==="Active"?"green":p.status==="Out"?"red":"gold"}">${esc(p.status||"Unknown")}</span></div><div class="small" style="margin-top:8px">${p.games||0} games remaining · ${esc(p.injuryStatus||"")}</div><div class="actions"><button class="btn secondary" onclick="editPlayer(${i})">Edit</button><button class="btn secondary" onclick="removePlayer(${i})">Remove</button></div></div>`}).join("")||'<div class="empty">No players loaded.</div>';renderSchedule()}
 function addPlayer(){const name=pName.value.trim();if(!name)return alert("Enter player name.");state.roster.push({name,slot:pSlot.value,team:pTeam.value.toUpperCase(),nbaTeamAbbreviation:pTeam.value.toUpperCase(),pos:pPos.value,games:Number(pGames.value)||0,status:pStatus.value,notes:""});pName.value=pTeam.value=pPos.value="";save();renderRoster()}
