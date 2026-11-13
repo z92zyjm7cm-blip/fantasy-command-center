@@ -186,23 +186,100 @@ tr:last-child td{border-bottom:0}
 </div>
 </section>
 
+
 <section id="view-waivers" class="hidden">
-<div class="hero"><span class="badge gold">WAIVER WIRE</span><h1>Find your next advantage.</h1><p>Rank candidates using the information you enter. Scores are heuristics, not live projections.</p></div>
+<div class="hero">
+<span class="badge gold">LIVE ESPN WAIVER INTELLIGENCE</span>
+<h1>Find your next advantage.</h1>
+<p>Live available players, ownership, eligibility and injury indicators from ESPN.</p>
+<div class="actions">
+<button class="btn" onclick="loadLiveWaivers()">Refresh player pool</button>
+<button class="btn secondary" onclick="showView('roster')">View Gold roster</button>
+</div>
+</div>
+
+<div class="grid">
 <div class="card">
+<div class="stat-label">Available players</div>
+<div class="stat" id="waiverCount">—</div>
+<div class="small">Returned by ESPN</div>
+</div>
+<div class="card">
+<div class="stat-label">Shortlist</div>
+<div class="stat" id="shortlistCount">0</div>
+<div class="small">Saved locally</div>
+</div>
+<div class="card">
+<div class="stat-label">Last refresh</div>
+<div class="stat" id="waiverUpdated" style="font-size:16px">Not loaded</div>
+<div class="small">ESPN player pool</div>
+</div>
+<div class="card">
+<div class="stat-label">Data source</div>
+<div class="stat" style="font-size:16px">ESPN LIVE</div>
+<div class="small" id="waiverSource">Awaiting refresh</div>
+</div>
+</div>
+
+<div class="section-title">Find available players</div>
+<div class="card">
+<div class="field">
+<label>Search player / team</label>
+<input id="waiverSearch" placeholder="Search name or NBA team" oninput="renderWaivers()">
+</div>
 <div class="formgrid">
-<div class="field"><label>Player</label><input id="wName" placeholder="Available player"></div>
-<div class="field"><label>NBA team</label><input id="wTeam" placeholder="BOS"></div>
-<div class="field"><label>Positions</label><input id="wPos" placeholder="SG, SF"></div>
-<div class="field"><label>Games remaining</label><input id="wGames" type="number" min="0" max="7" value="3"></div>
-<div class="field"><label>Minutes per game</label><input id="wMin" type="number" min="0" value="24"></div>
-<div class="field"><label>Category fit</label><select id="wFit"><option value="balanced">Balanced</option><option value="3PM">3PM</option><option value="REB">REB</option><option value="AST">AST</option><option value="STL">STL</option><option value="BLK">BLK</option><option value="PTS">PTS</option><option value="FG%">FG%</option><option value="FT%">FT%</option><option value="TO">Low TO</option></select></div>
-<div class="field"><label>Recent production (1–10)</label><input id="wProd" type="number" min="1" max="10" value="5"></div>
-<div class="field"><label>Injury risk</label><select id="wRisk"><option value="0">Low / none known</option><option value="1">Questionable</option><option value="2">Doubtful / out</option></select></div>
+<div class="field">
+<label>Position filter</label>
+<select id="waiverPosition" onchange="renderWaivers()">
+<option value="">All positions</option>
+<option value="PG">PG</option><option value="SG">SG</option>
+<option value="SF">SF</option><option value="PF">PF</option>
+<option value="C">C</option>
+</select>
 </div>
-<button class="btn" onclick="addWaiver()">Add candidate & rank</button>
+<div class="field">
+<label>Availability</label>
+<select id="waiverAvailability" onchange="renderWaivers()">
+<option value="all">All available</option>
+<option value="healthy">No reported injury</option>
+<option value="injured">Reported injury</option>
+</select>
 </div>
-<div class="section-title">Ranked candidates</div><div id="waiverList" class="stack"></div>
-<p class="small">Verify availability, current role/injury news, and category needs in ESPN before claiming.</p>
+<div class="field">
+<label>Sort by</label>
+<select id="waiverSort" onchange="renderWaivers()">
+<option value="ownership">Ownership ↓</option>
+<option value="name">Player name</option>
+</select>
+</div>
+<div class="field">
+<label>Players per page</label>
+<select id="waiverPageSize" onchange="renderWaivers()">
+<option value="25">25</option>
+<option value="50">50</option>
+</select>
+</div>
+</div>
+<div class="row">
+<button class="btn secondary" onclick="loadLiveWaivers()">Refresh ESPN</button>
+<button class="btn ghost" onclick="clearWaiverShortlist()">Clear shortlist</button>
+</div>
+<div id="waiverStatus" class="small" style="margin-top:10px">Not loaded yet.</div>
+</div>
+
+<div class="section-title">Available player pool</div>
+<div id="waiverList" class="stack">
+<div class="empty">Tap Refresh player pool to retrieve ESPN free agents.</div>
+</div>
+
+<div class="section-title">Your shortlist</div>
+<div id="waiverShortlist" class="stack">
+<div class="empty">Add players from the live pool to shortlist them.</div>
+</div>
+
+<div class="notice" style="margin-top:14px">
+ESPN availability and ownership are live. Player projections, category rankings, and drop recommendations require current statistical analysis; don't treat ownership as a performance score.
+</div>
 </section>
 
 <section id="view-trades" class="hidden">
@@ -305,20 +382,248 @@ async function loadLiveMatchup(){const el=document.getElementById("liveMatchup")
 function saveMatchup(){state.matchup={startDate:weekStart.value,endDate:weekEnd.value,opponent:opponentName.value,notes:matchupNotes.value};save();alert("Matchup notes saved locally.")}
 async function loadPlayerSchedules(){const start=state.matchup.startDate,end=state.matchup.endDate;if(!start||!end||start>end)return alert("Save valid matchup dates first.");try{const counts={};let cur=start;while(cur<=end){const date=cur.replaceAll("-","");const r=await fetch(API+"/api/schedule?date="+date);if(!r.ok)throw Error("Schedule HTTP "+r.status);const d=await r.json();for(const ev of d.events||[])for(const c of ev.competitions?.[0]?.competitors||[]){const id=String(c.team?.id??"");if(id)counts[id]=(counts[id]||0)+1}const [y,m,day]=cur.split("-").map(Number);cur=new Date(Date.UTC(y,m-1,day+1)).toISOString().slice(0,10)}let matched=0;state.roster.forEach(p=>{const id=String(p.nbaTeamId??"");p.games=id&&counts[id]!=null?counts[id]:0;if(id&&counts[id]!=null)matched++});state.scheduleLastUpdated=new Date().toISOString();save();alert(`Schedule loaded. Team IDs matched: ${matched}/${state.roster.length}. If zero, the ESPN/NBA team ID mapping needs to be corrected.`)}catch(e){alert("Schedule loading failed: "+e.message)}}
 function renderSchedule(){const el=document.getElementById("scheduleSummary");if(!el)return;el.innerHTML=[...state.roster].sort((a,b)=>(b.games||0)-(a.games||0)).slice(0,8).map(p=>`<div class="row"><span>${esc(p.name)}</span><span class="badge ${(p.games||0)>=4?"green":"gold"}">${p.games||0} games</span></div>`).join("")||'<div class="empty">Sync roster and load schedule.</div>'}
-function addWaiver(){const name=wName.value.trim();if(!name)return alert("Enter a player name.");state.waivers.push({name,team:wTeam.value.trim().toUpperCase(),pos:wPos.value.trim(),games:Number(wGames.value)||0,minutes:Number(wMin.value)||0,fit:wFit.value,prod:Number(wProd.value)||0,risk:Number(wRisk.value)||0});save();renderWaivers();wName.value=wTeam.value=wPos.value=""}
-function waiverScore(p){return p.prod*2+p.games*2+Math.min(p.minutes,36)*.25-p.risk*5}
-function renderWaivers(){const list=[...state.waivers].sort((a,b)=>waiverScore(b)-waiverScore(a));waiverList.innerHTML=list.map((p,i)=>`<div class="item"><div class="row"><div><strong>${i+1}. ${esc(p.name)}</strong><div class="small">${esc(p.team)} · ${esc(p.pos)} · ${esc(p.fit)} focus</div></div><div class="stat" style="font-size:20px">${waiverScore(p).toFixed(1)}</div></div><div class="actions"><span class="badge">${p.games} games</span><span class="badge">${p.minutes} MPG</span><span class="badge ${p.risk?"red":"green"}">Risk ${p.risk}</span><button class="btn ghost" onclick="deleteWaiver(${state.waivers.indexOf(p)})">Remove</button></div></div>`).join("")||'<div class="empty">Add candidates above.</div>'}
-function deleteWaiver(i){state.waivers.splice(i,1);save();renderWaivers()}
+
+let liveWaiverPlayers = [];
+let waiverLastUpdated = null;
+let waiverLoading = false;
+
+function waiverPositionNames(p) {
+  const ids = Array.isArray(p.eligibleSlots) ? p.eligibleSlots : [];
+  const map = {
+    0:"PG", 1:"SG", 2:"SF", 3:"PF", 4:"C",
+    5:"G", 6:"F", 7:"UTIL"
+  };
+  const names = ids.map(x => map[x]).filter(Boolean);
+  if (p.position != null) {
+    const primary = map[p.position] || "";
+    if (primary && !names.includes(primary)) names.unshift(primary);
+  }
+  return [...new Set(names)];
+}
+
+function waiverInjury(p) {
+  const s = String(p.injuryStatus || "").toUpperCase();
+  if (!s || s === "NORMAL" || s === "ACTIVE") return "No reported injury";
+  return s;
+}
+
+function waiverIsInjured(p) {
+  return waiverInjury(p) !== "No reported injury";
+}
+
+async function loadLiveWaivers() {
+  if (waiverLoading) return;
+
+  waiverLoading = true;
+  const status = document.getElementById("waiverStatus");
+  status.textContent = "Loading live ESPN player pool…";
+
+  try {
+    const response = await fetch(API + "/api/waivers?limit=50", {
+      cache: "no-store"
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || data.status !== "success") {
+      throw Error(data.error || "ESPN waiver request failed");
+    }
+
+    if (!Array.isArray(data.players)) {
+      throw Error("ESPN returned no players array");
+    }
+
+    liveWaiverPlayers = data.players;
+    waiverLastUpdated = new Date();
+
+    document.getElementById("waiverCount").textContent =
+      data.count ?? liveWaiverPlayers.length;
+
+    document.getElementById("waiverUpdated").textContent =
+      waiverLastUpdated.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+
+    document.getElementById("waiverSource").textContent =
+      data.source || "ESPN";
+
+    status.textContent =
+      "Live ESPN pool loaded: " + liveWaiverPlayers.length + " players.";
+
+    renderWaivers();
+  } catch (error) {
+    status.textContent = "Waiver refresh failed: " + error.message;
+  } finally {
+    waiverLoading = false;
+  }
+}
+
+function addLiveWaiver(id) {
+  const p = liveWaiverPlayers.find(x => String(x.id) === String(id));
+  if (!p) return;
+
+  const exists = state.waivers.some(
+    x => String(x.id) === String(p.id)
+  );
+
+  if (exists) {
+    alert("Player is already on your shortlist.");
+    return;
+  }
+
+  state.waivers.push({
+    id: p.id,
+    name: p.name,
+    team: p.nbaTeamAbbreviation || "",
+    pos: waiverPositionNames(p).join(", "),
+    ownership: p.ownership,
+    injuryStatus: p.injuryStatus || "",
+    source: "ESPN",
+    addedAt: new Date().toISOString()
+  });
+
+  save();
+  renderWaivers();
+}
+
+function deleteWaiver(i) {
+  state.waivers.splice(i, 1);
+  save();
+  renderWaivers();
+}
+
+function clearWaiverShortlist() {
+  if (!state.waivers.length) return;
+  if (!confirm("Clear your entire waiver shortlist?")) return;
+  state.waivers = [];
+  save();
+  renderWaivers();
+}
+
+function renderWaivers() {
+  const list = document.getElementById("waiverList");
+  const shortlist = document.getElementById("waiverShortlist");
+  if (!list || !shortlist) return;
+
+  const search = (
+    document.getElementById("waiverSearch")?.value || ""
+  ).toLowerCase();
+
+  const position =
+    document.getElementById("waiverPosition")?.value || "";
+
+  const availability =
+    document.getElementById("waiverAvailability")?.value || "all";
+
+  const sort =
+    document.getElementById("waiverSort")?.value || "ownership";
+
+  const pageSize = Number(
+    document.getElementById("waiverPageSize")?.value || 25
+  );
+
+  let players = liveWaiverPlayers.filter(p => {
+    const positions = waiverPositionNames(p);
+    const text = (
+      p.name + " " + p.nbaTeamAbbreviation
+    ).toLowerCase();
+
+    if (search && !text.includes(search)) return false;
+    if (position && !positions.includes(position)) return false;
+
+    if (availability === "healthy" && waiverIsInjured(p)) return false;
+    if (availability === "injured" && !waiverIsInjured(p)) return false;
+
+    return true;
+  });
+
+  players.sort((a, b) => {
+    if (sort === "name") return a.name.localeCompare(b.name);
+    return Number(b.ownership || 0) - Number(a.ownership || 0);
+  });
+
+  players = players.slice(0, pageSize);
+
+  list.innerHTML = players.map(p => {
+    const positions = waiverPositionNames(p).join(", ") || "Unknown";
+    const injury = waiverInjury(p);
+    const already = state.waivers.some(
+      x => String(x.id) === String(p.id)
+    );
+
+    return `
+      <div class="item">
+        <div class="row">
+          <div style="min-width:0">
+            <div class="item-title">${esc(p.name)}</div>
+            <div class="small">
+              ${esc(p.nbaTeamAbbreviation || "FA")} ·
+              ${esc(positions)}
+            </div>
+          </div>
+          <span class="badge ${
+            waiverIsInjured(p) ? "red" : "green"
+          }">${esc(injury)}</span>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <span class="small">ESPN ownership</span>
+          <strong>${p.ownership == null
+            ? "—"
+            : Number(p.ownership).toFixed(1) + "%"}</strong>
+        </div>
+
+        <div class="actions">
+          <button class="btn ${already ? "secondary" : ""}"
+            ${already ? "disabled" : ""}
+            onclick="addLiveWaiver(${JSON.stringify(String(p.id))})">
+            ${already ? "Shortlisted" : "＋ Shortlist"}
+          </button>
+        </div>
+      </div>
+    `;
+  }).join("") || '<div class="empty">No players match your filters.</div>';
+
+  document.getElementById("shortlistCount").textContent =
+    state.waivers.length;
+
+  shortlist.innerHTML = state.waivers.map((p, i) => `
+    <div class="item">
+      <div class="row">
+        <div>
+          <strong>${esc(p.name)}</strong>
+          <div class="small">
+            ${esc(p.team || "FA")} · ${esc(p.pos || "Unknown")}
+          </div>
+        </div>
+        <span class="badge gold">
+          ${p.ownership == null
+            ? "Ownership —"
+            : Number(p.ownership).toFixed(1) + "% owned"}
+        </span>
+      </div>
+      <div class="small" style="margin-top:8px">
+        ${esc(p.injuryStatus || "No injury information saved")}
+      </div>
+      <div class="actions">
+        <button class="btn ghost" onclick="deleteWaiver(${i})">
+          Remove
+        </button>
+      </div>
+    </div>
+  `).join("") || '<div class="empty">Your shortlist is empty.</div>';
+}
 function analyzeTrade(){const give=giveNames.value.split(",").map(x=>x.trim()).filter(Boolean),get=getNames.value.split(",").map(x=>x.trim()).filter(Boolean);tradeResult.innerHTML=`<div class="item"><strong>${esc(give.join(", ")||"—")} → ${esc(get.join(", ")||"—")}</strong><p class="small">Priority: ${esc(tradeNeed.value)} · Risk: ${esc(tradeRisk.value)}</p><ul><li>Compare real season and recent stats, not names alone.</li><li>Review injury status, role, minutes, and playoff schedule.</li><li>Check all nine category effects and center-slot eligibility.</li><li>Do not accept based on this checklist alone; no live projection model is connected.</li></ul></div>`}
 function exportData(){const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="fantasy-command-center-backup.json";a.click();URL.revokeObjectURL(url)}
 function importData(e){const f=e.target.files?.[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!Array.isArray(x.roster))throw Error();state={...state,...x};save();alert("Backup imported")}catch(err){alert("Invalid backup JSON")}};r.readAsText(f)}
 function resetData(){if(confirm("Clear local data? Export backup first.")){localStorage.removeItem(KEY);state=loadState();renderAll()}}
-async function testEndpoints(){const el=document.getElementById("diagnostics");el.textContent="Testing…";const out=[];for(const path of ["/api/dashboard","/api/matchup"]){try{const r=await fetch(API+path);const t=await r.text();out.push(path+" → HTTP "+r.status+"\n"+t.slice(0,350))}catch(e){out.push(path+" → "+e.message)}}el.textContent=out.join("\n\n")}
+async function testEndpoints(){const el=document.getElementById("diagnostics");el.textContent="Testing…";const out=[];for(const path of ["/api/dashboard","/api/matchup","/api/waivers"]){try{const r=await fetch(API+path);const t=await r.text();out.push(path+" → HTTP "+r.status+"\n"+t.slice(0,350))}catch(e){out.push(path+" → "+e.message)}}el.textContent=out.join("\n\n")}
 function renderCategories(){}
 function renderAll(){renderHome();renderRoster();renderWaivers();if(state.matchup.startDate)weekStart.value=state.matchup.startDate;if(state.matchup.endDate)weekEnd.value=state.matchup.endDate;opponentName.value=state.matchup.opponent||"";matchupNotes.value=state.matchup.notes||""}
 renderAll();
 syncESPN().catch(console.error);
 loadLiveMatchup();
-</script>
+loadLiveWaivers();</script>
 </body>
 </html>
