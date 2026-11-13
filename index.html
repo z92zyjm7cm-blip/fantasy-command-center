@@ -1,691 +1,293 @@
+
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#10131a">
 <title>Fantasy Command Center</title>
 <style>
 :root{--bg:#0c0f14;--panel:#151a22;--panel2:#1d2430;--text:#f4f6fa;--muted:#a6b0c0;--line:#2b3442;--blue:#6aa7ff;--gold:#ffca52;--green:#75d6a0;--red:#ff8585}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}.app{max-width:980px;margin:auto;padding:0 14px 96px}.top{padding:22px 4px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px}.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);font-weight:800}.brand{font-size:25px;font-weight:850;letter-spacing:-.03em}.sub{color:var(--muted);font-size:13px}.pill{border:1px solid var(--line);border-radius:99px;padding:7px 10px;color:var(--muted);font-size:12px}.tabs{display:flex;gap:8px;overflow:auto;padding:6px 0 14px;position:sticky;top:0;background:var(--bg);z-index:4}.tab{flex:0 0 auto;border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:12px;padding:10px 13px}.tab.active{background:#20344f;border-color:#3d78bd;color:white}.hero{background:linear-gradient(135deg,#1a2a40,#17202c 65%,#282316);border:1px solid #314258;border-radius:22px;padding:20px;margin:6px 0 16px}.hero h1{font-size:25px;line-height:1.15;margin:8px 0}.hero p{margin:8px 0;color:#d1d9e6}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.card{background:var(--panel);border:1px solid var(--line);border-radius:17px;padding:15px;min-width:0}.stat-label{color:var(--muted);font-size:12px}.stat{font-size:27px;font-weight:850;margin-top:3px}.section-title{font-size:18px;margin:22px 2px 10px;font-weight:800}.row{display:flex;align-items:center;justify-content:space-between;gap:12px}.btn{border:0;border-radius:12px;background:var(--blue);color:#08111e;font-weight:800;padding:11px 14px}.btn.secondary{background:var(--panel2);border:1px solid var(--line);color:var(--text)}.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--muted)}.btn.danger{background:#472a30;color:#ffd7d7}.stack{display:grid;gap:9px}.item{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px}.item-title{font-weight:800}.small{font-size:12px;color:var(--muted)}.badge{display:inline-block;border-radius:99px;background:#24364c;color:#b8d7ff;padding:3px 8px;font-size:11px;font-weight:750}.badge.gold{background:#45391e;color:#ffdf8b}.badge.green{background:#1d3a2d;color:#a2f2c2}.badge.red{background:#472a30;color:#ffbcbc}.field{display:grid;gap:5px;margin:10px 0}.field label{font-size:12px;color:var(--muted);font-weight:700}.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);background:#0e1218;color:var(--text);border-radius:10px;padding:11px}.field textarea{min-height:90px;resize:vertical}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:13px}table{width:100%;border-collapse:collapse;min-width:520px;font-size:13px}th,td{padding:10px;text-align:left;border-bottom:1px solid var(--line)}th{color:var(--muted);font-weight:700;background:#11161e}tr:last-child td{border-bottom:0}.empty{color:var(--muted);font-size:13px;padding:14px;text-align:center;border:1px dashed var(--line);border-radius:13px}.navbottom{position:fixed;bottom:0;left:0;right:0;background:rgba(12,15,20,.95);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:9px max(12px,env(safe-area-inset-right)) calc(9px + env(safe-area-inset-bottom));display:flex;justify-content:center;z-index:5}.navinner{display:flex;gap:7px;width:100%;max-width:950px}.navinner button{flex:1;padding:9px 3px;font-size:11px}.notice{border-left:3px solid var(--gold);padding:10px 12px;background:#282316;color:#f4e5bf;border-radius:0 10px 10px 0;font-size:13px}.good{color:var(--green)}.muted{color:var(--muted)}.hidden{display:none!important}.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.footer{color:#7f8a9b;font-size:11px;margin-top:24px;text-align:center}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.app{max-width:1050px;margin:auto;padding:0 14px 100px}
+.top{padding:22px 4px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);font-weight:800}
+.brand{font-size:25px;font-weight:850;letter-spacing:-.03em}
+.sub{color:var(--muted);font-size:13px}
+.pill{border:1px solid var(--line);border-radius:99px;padding:7px 10px;color:var(--muted);font-size:12px;white-space:nowrap}
+.tabs{display:flex;gap:8px;overflow:auto;padding:6px 0 14px;position:sticky;top:0;background:var(--bg);z-index:4}
+.tab{flex:0 0 auto;border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:12px;padding:10px 13px}
+.tab.active{background:#20344f;border-color:#3d78bd;color:white}
+.hero{background:linear-gradient(135deg,#1a2a40,#17202c 65%,#282316);border:1px solid #314258;border-radius:22px;padding:20px;margin:6px 0 16px}
+.hero h1{font-size:25px;line-height:1.15;margin:8px 0}
+.hero p{margin:8px 0;color:#d1d9e6}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:17px;padding:15px;min-width:0}
+.stat-label{color:var(--muted);font-size:12px}
+.stat{font-size:27px;font-weight:850;margin-top:3px}
+.section-title{font-size:18px;margin:22px 2px 10px;font-weight:800}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.btn{border:0;border-radius:12px;background:var(--blue);color:#08111e;font-weight:800;padding:11px 14px}
+.btn.secondary{background:var(--panel2);border:1px solid var(--line);color:var(--text)}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--muted)}
+.btn.danger{background:#472a30;color:#ffd7d7}
+.stack{display:grid;gap:9px}
+.item{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px}
+.item-title{font-weight:800}
+.small{font-size:12px;color:var(--muted)}
+.badge{display:inline-block;border-radius:99px;background:#24364c;color:#b8d7ff;padding:3px 8px;font-size:11px;font-weight:750}
+.badge.gold{background:#45391e;color:#ffdf8b}
+.badge.green{background:#1d3a2d;color:#a2f2c2}
+.badge.red{background:#472a30;color:#ffbcbc}
+.field{display:grid;gap:5px;margin:10px 0}
+.field label{font-size:12px;color:var(--muted);font-weight:700}
+.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);background:#0e1218;color:var(--text);border-radius:10px;padding:11px}
+.field textarea{min-height:90px;resize:vertical}
+.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:13px}
+table{width:100%;border-collapse:collapse;min-width:520px;font-size:13px}
+th,td{padding:10px;text-align:left;border-bottom:1px solid var(--line)}
+th{color:var(--muted);font-weight:700;background:#11161e}
+tr:last-child td{border-bottom:0}
+.empty{color:var(--muted);font-size:13px;padding:14px;text-align:center;border:1px dashed var(--line);border-radius:13px}
+.navbottom{position:fixed;bottom:0;left:0;right:0;background:rgba(12,15,20,.95);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:9px max(12px,env(safe-area-inset-right)) calc(9px + env(safe-area-inset-bottom));display:flex;justify-content:center;z-index:5}
+.navinner{display:flex;gap:7px;width:100%;max-width:950px}
+.navinner button{flex:1;padding:9px 3px;font-size:11px}
+.notice{border-left:3px solid var(--gold);padding:10px 12px;background:#282316;color:#f4e5bf;border-radius:0 10px 10px 0;font-size:13px}
+.good{color:var(--green)}
+.muted{color:var(--muted)}
+.hidden{display:none!important}
+.footer{color:#7f8a9b;font-size:11px;margin-top:24px;text-align:center}
+.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.actions button{font-size:13px}
+.status-win{color:var(--green)}
+.status-loss{color:var(--red)}
+.status-tie{color:var(--gold)}
 @media(min-width:700px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}.maincols{display:grid;grid-template-columns:1.1fr .9fr;gap:14px}.hero h1{font-size:31px}.app{padding-left:22px;padding-right:22px}}
 @media(max-width:390px){.brand{font-size:22px}.hero{padding:16px}.card{padding:12px}.formgrid{grid-template-columns:1fr}.navinner button{font-size:10px}}
 </style>
 </head>
 <body>
 <div class="app">
-<header class="top"><div><div class="eyebrow">ESPN NBA Fantasy · 2026–27</div><div class="brand">Fantasy Command Center</div><div class="sub">FANTASY LEAGUE 2K27 · League ID 603102510</div></div><span class="pill" id="dataStatus">Demo / local</span></header>
+<header class="top">
+<div>
+<div class="eyebrow">ESPN NBA Fantasy · 2026–27</div>
+<div class="brand">Fantasy Command Center</div>
+<div class="sub">FANTASY LEAGUE 2K27 · League ID 603102510</div>
+</div>
+<span class="pill" id="dataStatus">Connecting…</span>
+</header>
+
 <nav class="tabs" id="tabs">
-<button class="tab active" data-view="home">Overview</button><button class="tab" data-view="matchup">Matchup</button><button class="tab" data-view="roster">Roster</button><button class="tab" data-view="waivers">Waivers</button><button class="tab" data-view="trades">Trade lab</button><button class="tab" data-view="settings">Data & settings</button>
+<button class="tab active" data-view="home">Overview</button>
+<button class="tab" data-view="matchup">Matchup</button>
+<button class="tab" data-view="roster">Roster</button>
+<button class="tab" data-view="waivers">Waivers</button>
+<button class="tab" data-view="trades">Trade lab</button>
+<button class="tab" data-view="settings">Data & settings</button>
 </nav>
+
 <main>
 <section id="view-home">
-<div class="hero"><span class="badge gold">WEEKLY GAME PLAN</span><h1>Make the next move count.</h1><p>Your mobile-first fantasy workspace for matchup strategy, schedule leverage, waiver scouting, injury checks and trade decisions.</p><div class="row" style="justify-content:flex-start;flex-wrap:wrap;margin-top:15px"><button class="btn" onclick="showView('matchup')">Build weekly plan</button><button class="btn secondary" onclick="showView('waivers')">Scout waivers</button></div></div>
+<div class="hero">
+<span class="badge gold">WEEKLY GAME PLAN</span>
+<h1>Make the next move count.</h1>
+<p>Your workspace for matchup strategy, schedule leverage, waiver scouting, injury checks and trade decisions.</p>
+<div class="actions">
+<button class="btn" onclick="showView('matchup')">Build weekly plan</button>
+<button class="btn secondary" onclick="showView('waivers')">Scout waivers</button>
+<button class="btn secondary" onclick="syncESPN()">Sync ESPN</button>
+</div>
+</div>
+
 <div class="grid">
 <div class="card"><div class="stat-label">League size</div><div class="stat">10</div><div class="small">Head-to-head</div></div>
 <div class="card"><div class="stat-label">Categories</div><div class="stat">9</div><div class="small">FG%, FT%, 3PM, REB, AST, STL, BLK, TO, PTS</div></div>
 <div class="card"><div class="stat-label">Moves / matchup</div><div class="stat">7</div><div class="small">Waivers: 1 day</div></div>
 <div class="card"><div class="stat-label">Playoff field</div><div class="stat">8 teams</div><div class="small">3 rounds</div></div>
 </div>
-<div class="maincols"><div><div class="section-title">Your roster at a glance</div><div class="card"><div class="row"><div><div class="stat-label">Players in initial roster</div><div class="stat" id="rosterCount">14</div></div><button class="btn secondary" onclick="showView('roster')">Manage roster</button></div><p class="small">Initial roster transcribed from your screenshots. Verify player names, eligibility and NBA teams.</p><div id="rosterPreview" class="stack"></div></div></div><div><div class="section-title">Weekly checklist</div><div class="card stack" id="checklist"></div><div class="section-title">Important rules</div><div class="notice">Daily lineup locks at each player's scheduled game time. Lower turnovers are better. A waiver claim moves you to the back of the waiver order.</div></div></div>
-</section>
-<section id="view-matchup" class="hidden">
-<div class="hero"><span class="badge">WEEKLY MATCHUP</span><h1>Build your game plan</h1><p>Enter current category standings or opponent data to turn the report into targeted advice.</p></div>
-  
-<div class="section-title">Live ESPN Matchup</div>
-<div class="card">
-  <div id="liveMatchup" class="stack">
-    <div class="empty">Loading live matchup...</div>
-  </div>
-  <button class="btn secondary" onclick="loadLiveMatchup()">Refresh Live Matchup</button>
-</div>
 
-<div class="card"><div class="formgrid">
-<div class="field">
-<label>Matchup start date</label>
-<input id="weekStart" type="date">
-</div>
-<div class="field">
-<label>Matchup end date</label>
-<input id="weekEnd" type="date">
-</div>
-<div class="field"><label>Opponent team</label><input id="opponentName" placeholder="Opponent name"></div></div><div class="field"><label>Matchup notes / opponent strengths</label><textarea id="matchupNotes" placeholder="Paste matchup standings, opponent roster, or notes from ESPN..."></textarea></div><button class="btn" onclick="saveMatchup()">Save matchup notes</button></div>
-<div class="section-title">Matchup Intelligence</div>
+<div class="maincols">
+<div>
+<div class="section-title">Your live roster</div>
 <div class="card">
-  <div id="matchupIntel" class="stack">
-    <div class="empty">Refresh live matchup to generate strategy.</div>
-  </div>
+<div class="row">
+<div><div class="stat-label">Players loaded</div><div class="stat" id="rosterCount">0</div></div>
+<button class="btn secondary" onclick="showView('roster')">Manage roster</button>
 </div>
-<div class="section-title">Category battle plan</div><div class="tablewrap"><table><thead><tr><th>Category</th><th>Your status</th><th>Target</th><th>Notes</th></tr></thead><tbody id="categoryRows"></tbody></table></div>
-<div class="section-title">Schedule edge</div><div class="card"><p class="small">Enter remaining games for your roster on the Roster tab. More games help, but only if players are active and your lineup has open slots.</p>
-<button class="btn secondary" onclick="loadPlayerSchedules()">Load NBA Schedules</button>
-<div id="scheduleSummary" class="stack"></div>
+<p class="small">Synchronized from ESPN when the Worker returns roster data.</p>
+<div id="rosterPreview" class="stack"></div>
+</div>
+</div>
+<div>
+<div class="section-title">Weekly checklist</div>
+<div class="card stack" id="checklist"></div>
+<div class="section-title">League reminders</div>
+<div class="notice">Daily lineup locks at each player's scheduled game time. Lower turnovers are better. Confirm all claims and lineup moves in ESPN.</div>
+</div>
 </div>
 </section>
+
+<section id="view-matchup" class="hidden">
+<div class="hero"><span class="badge">WEEKLY MATCHUP</span><h1>Build your game plan</h1><p>Matchup standings are retrieved from your Cloudflare Worker.</p></div>
+<div class="card">
+<div class="row"><strong>Live ESPN Matchup</strong><button class="btn secondary" onclick="loadLiveMatchup()">Refresh</button></div>
+<div id="liveMatchup" class="stack" style="margin-top:12px"><div class="empty">Loading live matchup…</div></div>
+</div>
+<div class="section-title">Matchup dates & notes</div>
+<div class="card">
+<div class="formgrid">
+<div class="field"><label>Start date</label><input id="weekStart" type="date"></div>
+<div class="field"><label>End date</label><input id="weekEnd" type="date"></div>
+<div class="field"><label>Opponent team</label><input id="opponentName" placeholder="Opponent name"></div>
+</div>
+<div class="field"><label>Notes</label><textarea id="matchupNotes" placeholder="Category priorities, opponent strengths…"></textarea></div>
+<button class="btn" onclick="saveMatchup()">Save matchup notes</button>
+</div>
+<div class="section-title">Matchup intelligence</div>
+<div id="matchupIntel" class="stack"><div class="empty">Refresh live matchup to generate strategy.</div></div>
+<div class="section-title">Schedule edge</div>
+<div class="card">
+<button class="btn secondary" onclick="loadPlayerSchedules()">Load NBA schedules</button>
+<div id="scheduleSummary" class="stack" style="margin-top:10px"></div>
+</div>
+</section>
+
 <section id="view-roster" class="hidden">
-<div class="hero"><span class="badge">ROSTER ROOM</span><h1>Players & schedule</h1><p>Keep your roster and weekly availability in one place. Use the edit action to update roles and remaining games.</p></div>
-<div class="row" style="margin-bottom:10px"><input id="rosterSearch" placeholder="Search player" style="flex:1;min-width:0;background:#10151d;color:white;border:1px solid var(--line);border-radius:10px;padding:10px" oninput="renderRoster()"><button class="btn secondary" onclick="exportData()">Export data</button></div>
-<div id="rosterList" class="stack"></div>
-<div class="section-title">Add / update player</div><div class="card"><div class="formgrid"><div class="field"><label>Player name</label><input id="pName" placeholder="Player name"></div><div class="field"><label>Roster slot</label><select id="pSlot"><option>PG</option><option>SG</option><option>SF</option><option>PF</option><option>C</option><option>G</option><option>F</option><option>UTIL</option><option>BE</option><option>IR</option></select></div><div class="field"><label>NBA team</label><input id="pTeam" placeholder="e.g. BOS"></div><div class="field"><label>Eligible positions</label><input id="pPos" placeholder="e.g. PF, C"></div><div class="field"><label>Games remaining this matchup</label><input id="pGames" type="number" min="0" max="7" value="0"></div><div class="field"><label>Injury / status</label><select id="pStatus"><option>Unknown</option><option>Active</option><option>Questionable</option><option>Doubtful</option><option>Out</option><option>IR</option></select></div></div><button class="btn" onclick="addPlayer()">Save player</button></div>
-</section>
-<section id="view-waivers" class="hidden">
-<div class="hero"><span class="badge gold">WAIVER WIRE</span><h1>Find your next advantage.</h1><p>Rank candidate pickups by schedule, minutes, production and fit. Rankings are estimates from the data you enter—not live ESPN projections.</p></div>
-<div class="card"><div class="formgrid"><div class="field"><label>Player</label><input id="wName" placeholder="Available player"></div><div class="field"><label>NBA team</label><input id="wTeam" placeholder="e.g. ORL"></div><div class="field"><label>Positions</label><input id="wPos" placeholder="e.g. SG, SF"></div><div class="field"><label>Games remaining</label><input id="wGames" type="number" min="0" max="7" value="3"></div><div class="field"><label>Minutes per game</label><input id="wMin" type="number" min="0" value="24"></div><div class="field"><label>Category fit</label><select id="wFit"><option value="balanced">Balanced</option><option value="3PM">3PM</option><option value="REB">Rebounds</option><option value="AST">Assists</option><option value="STL">Steals</option><option value="BLK">Blocks</option><option value="PTS">Points</option><option value="FG%">FG%</option><option value="FT%">FT%</option><option value="TO">Low turnovers</option></select></div><div class="field"><label>Recent fantasy production (1–10)</label><input id="wProd" type="number" min="1" max="10" value="5"></div><div class="field"><label>Injury risk</label><select id="wRisk"><option value="0">Low / none known</option><option value="1">Questionable</option><option value="2">Doubtful / out</option></select></div></div><button class="btn" onclick="addWaiver()">Add candidate & rank</button></div>
-<div class="section-title">Ranked candidates</div><div id="waiverList" class="stack"></div><p class="small">Always verify the player is actually available, current role/injury news, and your category needs in ESPN before claiming.</p>
-</section>
-<section id="view-trades" class="hidden">
-<div class="hero"><span class="badge">TRADE LAB</span><h1>Trade for category fit.</h1><p>Compare players using a transparent quick score, then review the category-specific impact and roster fit.</p></div>
-<div class="card"><div class="formgrid"><div class="field"><label>Players you give (comma-separated)</label><input id="giveNames" placeholder="e.g. Tyler Herro"></div><div class="field"><label>Players you receive</label><input id="getNames" placeholder="e.g. another player"></div><div class="field"><label>Your biggest category need</label><select id="tradeNeed"><option>Balanced</option><option>FG%</option><option>FT%</option><option>3PM</option><option>REB</option><option>AST</option><option>STL</option><option>BLK</option><option>TO</option><option>PTS</option></select></div><div class="field"><label>Risk tolerance</label><select id="tradeRisk"><option>Balanced</option><option>Prefer safer production</option><option>Upside / injured-return gamble</option></select></div></div><button class="btn" onclick="analyzeTrade()">Compare trade</button><div id="tradeResult" style="margin-top:12px"></div></div>
-<div class="section-title">Trade checklist</div><div class="card stack"><div>✓ Does the trade improve a category you can win?</div><div>✓ Does it damage FG% / FT% through high volume?</div><div>✓ Does it create a positional or center-slot problem?</div><div>✓ Have you checked injuries, rest risk and playoff schedule?</div></div>
-</section>
-<section id="view-settings" class="hidden">
-<div class="hero"><span class="badge">DATA CENTER</span><h1>Your league settings</h1><p>These are the rules transcribed from your ESPN screenshots. Data is stored locally in this browser on this device.</p></div>
-<div class="card stack">
-<div class="row"><span class="muted">League</span><strong>FANTASY LEAGUE 2K27</strong></div><div class="row"><span class="muted">League ID</span><strong>603102510</strong></div><div class="row"><span class="muted">Scoring</span><strong>H2H 9-category</strong></div><div class="row"><span class="muted">Acquisitions</span><strong>7 per 7-day matchup</strong></div><div class="row"><span class="muted">Waiver period</span><strong>1 day</strong></div><div class="row"><span class="muted">Lineup lock</span><strong>At scheduled game time</strong></div><div class="row"><span class="muted">Regular season</span><strong>20 matchups</strong></div><div class="row"><span class="muted">Playoffs</span><strong>8 teams · 3 rounds</strong></div><div class="row"><span class="muted">Roster</span><strong>14 roster slots + IR structure</strong></div>
+<div class="hero"><span class="badge">ROSTER ROOM</span><h1>Players & schedule</h1><p>ESPN roster sync plus editable local schedule/status fields.</p></div>
+<div class="row" style="margin-bottom:10px">
+<input id="rosterSearch" placeholder="Search player" style="flex:1;min-width:0;background:#10151d;color:white;border:1px solid var(--line);border-radius:10px;padding:10px" oninput="renderRoster()">
+<button class="btn secondary" onclick="exportData()">Export</button>
 </div>
-<div class="section-title">Data access & backup</div><div class="notice">This prototype does not connect to ESPN, fetch live injuries, or submit roster moves. It stores edits locally in this browser. Export a backup before clearing browser data or changing devices.</div>
-<div class="row" style="margin-top:12px;flex-wrap:wrap"><button class="btn" onclick="exportData()">Export backup JSON</button><label class="btn secondary" for="importFile">Import backup JSON</label><input class="hidden" id="importFile" type="file" accept="application/json" onchange="importData(event)"><button class="btn danger" onclick="resetData()">Reset local data</button></div>
+<div id="rosterList" class="stack"></div>
+<div class="section-title">Add player manually</div>
+<div class="card">
+<div class="formgrid">
+<div class="field"><label>Player name</label><input id="pName" placeholder="Player name"></div>
+<div class="field"><label>Slot</label><select id="pSlot"><option>PG</option><option>SG</option><option>SF</option><option>PF</option><option>C</option><option>G</option><option>F</option><option>UTIL</option><option>BE</option><option>IR</option></select></div>
+<div class="field"><label>NBA team abbreviation</label><input id="pTeam" placeholder="BOS"></div>
+<div class="field"><label>Positions</label><input id="pPos" placeholder="PG, SG"></div>
+<div class="field"><label>Games remaining</label><input id="pGames" type="number" min="0" max="7" value="0"></div>
+<div class="field"><label>Status</label><select id="pStatus"><option>Unknown</option><option>Active</option><option>Questionable</option><option>Doubtful</option><option>Out</option><option>IR</option></select></div>
+</div>
+<button class="btn" onclick="addPlayer()">Add player</button>
+</div>
+</section>
+
+<section id="view-waivers" class="hidden">
+<div class="hero"><span class="badge gold">WAIVER WIRE</span><h1>Find your next advantage.</h1><p>Rank candidates using the information you enter. Scores are heuristics, not live projections.</p></div>
+<div class="card">
+<div class="formgrid">
+<div class="field"><label>Player</label><input id="wName" placeholder="Available player"></div>
+<div class="field"><label>NBA team</label><input id="wTeam" placeholder="BOS"></div>
+<div class="field"><label>Positions</label><input id="wPos" placeholder="SG, SF"></div>
+<div class="field"><label>Games remaining</label><input id="wGames" type="number" min="0" max="7" value="3"></div>
+<div class="field"><label>Minutes per game</label><input id="wMin" type="number" min="0" value="24"></div>
+<div class="field"><label>Category fit</label><select id="wFit"><option value="balanced">Balanced</option><option value="3PM">3PM</option><option value="REB">REB</option><option value="AST">AST</option><option value="STL">STL</option><option value="BLK">BLK</option><option value="PTS">PTS</option><option value="FG%">FG%</option><option value="FT%">FT%</option><option value="TO">Low TO</option></select></div>
+<div class="field"><label>Recent production (1–10)</label><input id="wProd" type="number" min="1" max="10" value="5"></div>
+<div class="field"><label>Injury risk</label><select id="wRisk"><option value="0">Low / none known</option><option value="1">Questionable</option><option value="2">Doubtful / out</option></select></div>
+</div>
+<button class="btn" onclick="addWaiver()">Add candidate & rank</button>
+</div>
+<div class="section-title">Ranked candidates</div><div id="waiverList" class="stack"></div>
+<p class="small">Verify availability, current role/injury news, and category needs in ESPN before claiming.</p>
+</section>
+
+<section id="view-trades" class="hidden">
+<div class="hero"><span class="badge">TRADE LAB</span><h1>Trade for category fit.</h1><p>Review roster fit and category needs before making a deal.</p></div>
+<div class="card">
+<div class="formgrid">
+<div class="field"><label>Players you give</label><input id="giveNames" placeholder="e.g. Tyler Herro"></div>
+<div class="field"><label>Players you receive</label><input id="getNames" placeholder="e.g. another player"></div>
+<div class="field"><label>Biggest category need</label><select id="tradeNeed"><option>Balanced</option><option>FG%</option><option>FT%</option><option>3PM</option><option>REB</option><option>AST</option><option>STL</option><option>BLK</option><option>TO</option><option>PTS</option></select></div>
+<div class="field"><label>Risk tolerance</label><select id="tradeRisk"><option>Balanced</option><option>Prefer safer production</option><option>Upside / injured-return gamble</option></select></div>
+</div>
+<button class="btn" onclick="analyzeTrade()">Review trade</button>
+<div id="tradeResult" style="margin-top:12px"></div>
+</div>
+<div class="section-title">Trade checklist</div>
+<div class="card stack"><div>✓ Does the trade improve a category you can win?</div><div>✓ Does it damage FG% / FT% through high volume?</div><div>✓ Does it create a positional or center-slot problem?</div><div>✓ Have you checked injuries, rest risk and playoff schedule?</div></div>
+</section>
+
+<section id="view-settings" class="hidden">
+<div class="hero"><span class="badge">DATA CENTER</span><h1>Your league settings</h1><p>League rules and API connection status.</p></div>
+<div class="card stack">
+<div class="row"><span class="muted">League</span><strong>FANTASY LEAGUE 2K27</strong></div>
+<div class="row"><span class="muted">League ID</span><strong>603102510</strong></div>
+<div class="row"><span class="muted">Scoring</span><strong>H2H 9-category</strong></div>
+<div class="row"><span class="muted">Acquisitions</span><strong>7 per matchup</strong></div>
+<div class="row"><span class="muted">Waiver period</span><strong>1 day</strong></div>
+<div class="row"><span class="muted">Lineup lock</span><strong>At scheduled game time</strong></div>
+<div class="row"><span class="muted">Regular season</span><strong>20 matchups</strong></div>
+<div class="row"><span class="muted">Playoffs</span><strong>8 teams · 3 rounds</strong></div>
+</div>
+<div class="section-title">Connection diagnostics</div>
+<div class="card">
+<button class="btn secondary" onclick="testEndpoints()">Test Worker endpoints</button>
+<pre id="diagnostics" style="white-space:pre-wrap;overflow-wrap:anywhere;color:var(--muted)"></pre>
+</div>
+<div class="section-title">Backup & restore</div>
+<div class="row" style="margin-top:12px;flex-wrap:wrap">
+<button class="btn" onclick="exportData()">Export backup JSON</button>
+<label class="btn secondary" for="importFile">Import backup JSON</label>
+<input class="hidden" id="importFile" type="file" accept="application/json" onchange="importData(event)">
+<button class="btn danger" onclick="resetData()">Reset local data</button>
+</div>
+<div class="notice" style="margin-top:12px">This dashboard is unofficial. It does not submit lineup or waiver moves to ESPN.</div>
 </section>
 </main>
-<div class="footer">Unofficial fantasy decision-support prototype · Not affiliated with ESPN or the NBA.</div>
+<div class="footer">Fantasy Command Center · Unofficial ESPN fantasy companion</div>
 </div>
-<div class="navbottom"><div class="navinner"><button class="btn secondary" onclick="showView('home')">⌂<br>Home</button><button class="btn secondary" onclick="showView('matchup')">⚔<br>Matchup</button><button class="btn secondary" onclick="showView('roster')">◎<br>Roster</button><button class="btn secondary" onclick="showView('waivers')">＋<br>Waivers</button><button class="btn secondary" onclick="showView('trades')">⇄<br>Trades</button></div></div>
+
+<div class="navbottom"><div class="navinner">
+<button class="btn secondary" onclick="showView('home')">⌂<br>Home</button>
+<button class="btn secondary" onclick="showView('matchup')">⚔<br>Matchup</button>
+<button class="btn secondary" onclick="showView('roster')">◎<br>Roster</button>
+<button class="btn secondary" onclick="showView('waivers')">＋<br>Waivers</button>
+<button class="btn secondary" onclick="showView('trades')">⇄<br>Trades</button>
+</div></div>
+
 <script>
-const KEY="fantasyCommandCenter.v1";
-const initialRoster=[
-{name:"Tyler Herro",slot:"PG",pos:"SG, PG",team:"MIL",status:"Unknown",games:0,notes:"Screenshot transcription; verify current team/eligibility."},
-{name:"Ryan Rollins",slot:"SG",pos:"SG, PG",team:"MIL",status:"Unknown",games:0,notes:"Verify current team/eligibility."},
-{name:"Jayson Tatum",slot:"SF",pos:"PF, SF",team:"BOS",status:"Unknown",games:0,notes:""},
-{name:"OG Anunoby",slot:"PF",pos:"SF, PF",team:"NYK",status:"Unknown",games:0,notes:""},
-{name:"Myles Turner",slot:"C",pos:"C",team:"MIL",status:"Unknown",games:0,notes:""},
-{name:"Tyrese Haliburton",slot:"G",pos:"PG, SG",team:"IND",status:"Unknown",games:0,notes:""},
-{name:"Toumani Camara",slot:"F",pos:"PF, SF",team:"POR",status:"Unknown",games:0,notes:""},
-{name:"Ayo Dosunmu",slot:"UTIL",pos:"SG, PG",team:"CHI",status:"Unknown",games:0,notes:""},
-{name:"Ty Jerome",slot:"UTIL",pos:"SG, PG",team:"MEM",status:"Unknown",games:0,notes:""},
-{name:"Onyeka Okongwu",slot:"UTIL",pos:"C",team:"ATL",status:"Unknown",games:0,notes:""},
-{name:"Jarrett Allen",slot:"BE",pos:"C",team:"CLE",status:"Unknown",games:0,notes:""},
-{name:"Jonathan Kuminga",slot:"BE",pos:"PF, SF",team:"GSW",status:"Unknown",games:0,notes:""},
-{name:"Y. Lendeborg",slot:"BE",pos:"SF, PF",team:"GSW",status:"Unknown",games:0,notes:"Screenshot name/team require verification; red status icon shown."},
-{name:"Evan Mobley",slot:"BE",pos:"PF, C",team:"CLE",status:"Unknown",games:0,notes:""}
+const API="https://fantasy-command-center-api.z92zyjm7cm.workers.dev";
+const KEY="fantasyCommandCenter.v2";
+const categories=[
+{id:19,name:"FG%"},{id:20,name:"FT%"},{id:11,name:"3PM"},{id:6,name:"REB"},{id:3,name:"AST"},{id:1,name:"STL"},{id:2,name:"BLK"},{id:17,name:"TO"},{id:0,name:"PTS"}
 ];
-const categories=["FG%","FT%","3PM","REB","AST","STL","BLK","TO","PTS"];
-let state=load();
-function load(){try{const x=JSON.parse(localStorage.getItem(KEY));if(x){x.matchup=x.matchup||{};x.matchup.startDate=x.matchup.startDate||"";x.matchup.endDate=x.matchup.endDate||"";return x}}catch(e){}return {roster:initialRoster,waivers:[],checklist:{},matchup:{week:"",startDate:"",endDate:"",opponent:"",notes:""},categories:{}}}
+let state=loadState();
+function loadState(){try{const x=JSON.parse(localStorage.getItem(KEY));if(x&&Array.isArray(x.roster)){x.waivers=x.waivers||[];x.checklist=x.checklist||{};x.matchup=x.matchup||{};return x}}catch(e){}return {roster:[],waivers:[],checklist:{},matchup:{startDate:"",endDate:"",opponent:"",notes:""}}}
 function save(){localStorage.setItem(KEY,JSON.stringify(state));renderAll()}
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function showView(v){document.querySelectorAll("main section").forEach(s=>s.classList.add("hidden"));document.getElementById("view-"+v).classList.remove("hidden");document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.view===v));window.scrollTo({top:0,behavior:"smooth"});if(v==="roster")renderRoster();if(v==="waivers")renderWaivers()}
 document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>showView(t.dataset.view)));
-function renderHome(){document.getElementById("rosterCount").textContent=state.roster.length;document.getElementById("rosterPreview").innerHTML=state.roster.slice(0,5).map(p=>`<div class="row"><div><div class="item-title">${esc(p.name)}</div><div class="small">${esc(p.slot)} · ${esc(p.team)}</div></div><span class="badge ${p.status==="Active"?"green":p.status==="Out"?"red":"gold"}">${esc(p.status)}</span></div>`).join("");const tasks=[["Refresh injury statuses","Update roster statuses before lineup lock."],["Check schedule density","Enter remaining games for your players."],["Review category targets","Use matchup notes to identify close categories."],["Save waiver moves","Use claims where they can swing a category."]];document.getElementById("checklist").innerHTML=tasks.map(([a,b],i)=>`<label class="row" style="align-items:flex-start;justify-content:flex-start"><input type="checkbox" ${state.checklist[i]?"checked":""} onchange="state.checklist[${i}]=this.checked;save()" style="margin-top:4px"><span><strong>${a}</strong><div class="small">${b}</div></span></label>`).join("")}
-
-function renderRoster() {
-  const q = (document.getElementById("rosterSearch")?.value || "").toLowerCase();
-
-  const slotNames = {
-    "0": "PG",
-    "1": "SG",
-    "2": "SF",
-    "3": "PF",
-    "4": "C",
-    "5": "G",
-    "6": "F",
-    "11": "UTIL",
-    "12": "Bench",
-    "13": "IR"
-  };
-
-  const list = state.roster
-    .filter(p => (p.name + " " + p.pos + " " + p.slot).toLowerCase().includes(q))
-    .sort((a, b) => Number(a.slot) - Number(b.slot));
-
-  document.getElementById("rosterList").innerHTML = list.map(p => {
-    const i = state.roster.indexOf(p);
-    const slot = String(p.slot ?? "");
-    const slotLabel = slotNames[slot] || slot || "Unknown";
-    const status = slot === "13" ? "IR" : (p.status || "Unknown");
-    const badgeClass = status === "Active" ? "green" :
-      status === "Out" ? "red" : "gold";
-
-    return `<div class="item">
-      <div class="row">
-        <div>
-          <div class="item-title">${esc(p.name)}</div>
-          <div class="small">${esc(p.pos || "Unknown")} · ${esc(slotLabel)}</div>
-        </div>
-        <span class="badge ${badgeClass}">${esc(status)}</span>
-      </div>
-      <div class="small" style="margin-top:10px">
-        ${Number(p.games) > 0 ? Number(p.games) + " games remaining" : "Schedule not loaded"}
-      </div>
-      <div style="display:flex;gap:6px;margin-top:10px">
-        <button class="btn secondary" onclick="editPlayer(${i})">Edit</button>
-        <button class="btn secondary" onclick="removePlayer(${i})">Remove</button>
-      </div>
-      ${p.notes ? `<div class="small" style="margin-top:7px">${esc(p.notes)}</div>` : ""}
-    </div>`;
-  }).join("") || '<div class="empty">No players match.</div>';
-
-  renderSchedule();
-}
-
-function addPlayer(){const name=document.getElementById("pName").value.trim();if(!name){alert("Enter a player name.");return}state.roster.push({name,slot:document.getElementById("pSlot").value,team:document.getElementById("pTeam").value.trim().toUpperCase(),pos:document.getElementById("pPos").value.trim(),games:Number(document.getElementById("pGames").value)||0,status:document.getElementById("pStatus").value,notes:""});["pName","pTeam","pPos"].forEach(id=>document.getElementById(id).value="");save();renderRoster()}
-function editPlayer(i){const p=state.roster[i];const name=prompt("Player name",p.name);if(name===null)return;const slot=prompt("Roster slot",p.slot);if(slot===null)return;const team=prompt("NBA team",p.team);if(team===null)return;const pos=prompt("Eligible positions",p.pos);if(pos===null)return;const games=prompt("Games remaining this matchup",p.games);if(games===null)return;const status=prompt("Status: Unknown, Active, Questionable, Doubtful, Out, IR",p.status);if(status===null)return;Object.assign(p,{name:name.trim(),slot:slot.trim().toUpperCase(),team:team.trim().toUpperCase(),pos:pos.trim(),games:Number(games)||0,status:status.trim()});save();renderRoster()}
-function removePlayer(i){if(confirm("Remove "+state.roster[i].name+" from your local roster reference?")){state.roster.splice(i,1);save();renderRoster()}}
-
-
-
-
-async function loadPlayerSchedules() {
-  try {
-    const start = state.matchup.startDate;
-    const end = state.matchup.endDate;
-
-    if (!start || !end || start > end) {
-      alert("Please save valid matchup dates first.");
-      return;
-    }
-
-    const gamesByTeamId = {};
-    let cursor = start;
-
-    while (cursor <= end) {
-      const date = cursor.replaceAll("-", "");
-
-      const res = await fetch(
-        `https://fantasy-command-center-api.z92zyjm7cm.workers.dev/api/schedule?date=${date}`
-      );
-
-      if (!res.ok) {
-        throw new Error("Schedule API error: " + res.status);
-      }
-
-      const data = await res.json();
-
-      for (const event of data.events || []) {
-        for (const competitor of
-          event.competitions?.[0]?.competitors || []) {
-
-          const teamId = String(competitor.team?.id ?? "");
-
-          if (teamId) {
-            gamesByTeamId[teamId] =
-              (gamesByTeamId[teamId] || 0) + 1;
-          }
-        }
-      }
-
-      const [y, m, d] = cursor.split("-").map(Number);
-
-      cursor = new Date(Date.UTC(y, m - 1, d + 1))
-        .toISOString()
-        .slice(0, 10);
-    }
-
-    let matched = 0;
-
-    state.roster.forEach(player => {
-      const teamId = String(player.nbaTeamId ?? "");
-
-      if (teamId && gamesByTeamId[teamId] !== undefined) {
-        player.games = gamesByTeamId[teamId];
-        matched++;
-      } else {
-        player.games = 0;
-      }
-    });
-
-    state.scheduleLastUpdated = new Date().toISOString();
-
-    save();
-
-    alert(
-      `Schedule loaded!\n` +
-      `Players matched: ${matched}/${state.roster.length}`
-    );
-
-  } catch (error) {
-    console.error("Schedule loading failed:", error);
-    alert("Schedule loading failed: " + error.message);
-  }
-}
-
-      const [y,m,d]=cursor.split("-").map(Number);
-      cursor=new Date(Date.UTC(y,m-1,d+1))
-        .toISOString().slice(0,10);
-    }
-
-    state.roster.forEach(p=>{
-  p.games=gamesByTeamId[p.nbaTeamId]||0;
-});
-
-    save();
-    alert("Player schedules loaded successfully!");
-  }catch(error){
-    console.error(error);
-    alert("Schedule loading failed: "+error.message);
-  }
-}
-
-function renderSchedule(){const sorted=[...state.roster].sort((a,b)=>(Number(b.games)||0)-(Number(a.games)||0));document.getElementById("scheduleSummary").innerHTML=sorted.slice(0,5).map(p=>`<div class="row"><span>${esc(p.name)}</span><span class="badge ${Number(p.games)>=4?"green":Number(p.games)<=1?"gold":""}">${Number(p.games)||0} games</span></div>`).join("")||`<div class="empty">Add schedule data on the Roster tab.</div>`}
-
-function saveMatchup(){
-  const start=document.getElementById("weekStart").value;
-  const end=document.getElementById("weekEnd").value;
-
-  state.matchup={
-    week:start&&end?`${start} – ${end}`:"",
-    startDate:start,
-    endDate:end,
-    opponent:document.getElementById("opponentName").value,
-    notes:document.getElementById("matchupNotes").value
-  };
-
-  save();
-  alert("Matchup notes saved on this device.");
-}
-
-
-
-
-
-
-function renderMatchupIntel(goldStats, oppStats) {
-  const el = document.getElementById("matchupIntel");
-  if (!el) return;
-
-  const cats = [
-    {id:19,name:"FG%"},
-    {id:20,name:"FT%"},
-    {id:11,name:"3PM"},
-    {id:6,name:"REB"},
-    {id:3,name:"AST"},
-    {id:1,name:"STL"},
-    {id:2,name:"BLK"},
-    {id:17,name:"TO"},
-    {id:0,name:"PTS"}
-  ];
-
-  const rows = cats.map(c => {
-    const g = goldStats[c.id]?.score;
-    const o = oppStats[c.id]?.score;
-    const result = goldStats[c.id]?.result;
-
-    if (g == null || o == null) {
-      return {
-        name:c.name,
-        action:"MONITOR",
-        color:"gold",
-        reason:"Insufficient live category data."
-      };
-    }
-
-  
-    return {name:c.name,action,color,reason,gap};
-  });
-
-  const protect = rows.filter(r => r.action === "PROTECT").length;
-  const attack = rows.filter(r => r.action === "ATTACK").length;
-  const monitor = rows.filter(r => r.action === "MONITOR").length;
-
-  el.innerHTML = `
-    <div class="card">
-      <div class="card-title">MATCHUP STRATEGY</div>
-
-      <div class="grid grid-3">
-        <div class="stat">
-          <div class="stat-label">PROTECT</div>
-          <div class="stat-value">${protect}</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">ATTACK</div>
-          <div class="stat-value">${attack}</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">MONITOR</div>
-          <div class="stat-value">${monitor}</div>
-        </div>
-      </div>
-
-      <div class="intel-list">
-        ${rows.map(r => `
-          <div class="intel-row">
-            <div class="intel-category">${r.name}</div>
-            <div class="intel-action ${r.color}">${r.action}</div>
-            <div class="intel-reason">${r.reason}</div>
-          </div>
-        `).join("")}
-      </div>
-
-      <div class="muted small">
-        Recommendations use current category results and score margins.
-        Remaining games and player projections are not yet factored in.
-      </div>
-    </div>
-  `;
-}
-
-    const gap = Math.abs(Number(g)-Number(o));
-    let action, color, reason;
-
-    if (result === "WIN") {
-      action = "Protect";
-      color = "green";
-      reason = "Currently leading. Avoid sacrificing this category unnecessarily.";
-    } else if (result === "LOSS") {
-      action = gap <= 3 ? "Attack" : "Monitor";
-      color = gap <= 3 ? "gold" : "red";
-      reason = gap <= 3
-        ? "Close deficit. Consider targeted games or category specialists."
-        : "Deficit is substantial. Evaluate whether recovery is realistic.";
-    } else {
-      action = "Monitor";
-      color = "gold";
-      reason = "Category is tied or unresolved. Reassess after more games.";
-    }
-
-    if (c.name === "TO" && result === "WIN") {
-      reason = "Lower turnovers are better. Protect this advantage.";
-    }
-
-    return {name:c.name,action,color,reason};
-  });
-
-  el.innerHTML = rows.map(r => `
-    <div class="item">
-      <div class="row">
-        <strong>${esc(r.name)}</strong>
-        <span class="badge ${r.color}">${esc(r.action)}</span>
-      </div>
-      <div class="small" style="margin-top:6px">${esc(r.reason)}</div>
-    </div>
-  `).join("");
-}
-
-
-async function loadLiveMatchup(){
-  const el = document.getElementById("liveMatchup");
-  if (!el) return;
-
-  el.innerHTML = '<div class="empty">Loading live matchup...</div>';
-
-  try {
-    const [matchupRes, dashboardRes] = await Promise.all([
-      fetch("https://fantasy-command-center-api.z92zyjm7cm.workers.dev/api/matchup"),
-      fetch("https://fantasy-command-center-api.z92zyjm7cm.workers.dev/api/dashboard")
-    ]);
-
-    if (!matchupRes.ok) throw new Error("Matchup API error: " + matchupRes.status);
-    if (!dashboardRes.ok) throw new Error("Dashboard API error: " + dashboardRes.status);
-
-    const data = await matchupRes.json();
-    const dashboard = await dashboardRes.json();
-
-    if (data.status !== "success") {
-      throw new Error(data.error || "Invalid matchup data");
-    }
-
-    const home = data.matchup?.home;
-    const away = data.matchup?.away;
-
-    if (!home || !away) throw new Error("Matchup sides missing");
-
-    const goldIsHome = Number(home.teamId) === 5;
-    const goldSide = goldIsHome ? home : away;
-    const oppSide = goldIsHome ? away : home;
-
-    // Correct source of category statistics
-    const goldStats =
-      goldSide.cumulativeScore?.scoreByStat || {};
-
-    const oppStats =
-      oppSide.cumulativeScore?.scoreByStat || {};
-
-    // Correct source of matchup W-L-T
-    const goldScore = goldSide.cumulativeScore || {};
-    const oppScore = oppSide.cumulativeScore || {};
-
-    // Resolve actual team names using live league data
-    const goldTeam = dashboard.teams?.find(
-      t => Number(t.id) === 5
-    );
-
-    const opponentTeam = dashboard.teams?.find(
-      t => Number(t.id) === Number(oppSide.teamId)
-    );
-
-    const goldName = goldTeam?.name || "Gold";
-    const opponentName = opponentTeam?.name || "Opponent";
-
-    // Render category intelligence
-    renderMatchupIntel(goldStats, oppStats);
-
-    const categories = [
-      {id:19,name:"FG%",pct:true},
-      {id:20,name:"FT%",pct:true},
-      {id:11,name:"3PM"},
-      {id:6,name:"REB"},
-      {id:3,name:"AST"},
-      {id:1,name:"STL"},
-      {id:2,name:"BLK"},
-      {id:17,name:"TO"},
-      {id:0,name:"PTS"}
-    ];
-
-    const formatValue = (id,value) => {
-      if(value == null) return "-";
-
-      if(id === 19 || id === 20){
-        return (Number(value)*100).toFixed(1)+"%";
-      }
-
-      return Number(value).toLocaleString();
-    };
-
-    const categoryRows = categories.map(c => {
-      const gold = goldStats[c.id]?.score;
-      const opp = oppStats[c.id]?.score;
-      const result = goldStats[c.id]?.result;
-
-      const color = result === "WIN" ? "#22c55e" :
-                   result === "LOSS" ? "#ef4444" :
-                   "#a6b0c0";
-
-      return `
-        <div class="grid"
-          style="grid-template-columns:1fr 1fr 1fr 1fr;
-          align-items:center;padding:8px 0;
-          border-bottom:1px solid var(--line)">
-
-          <div style="text-align:right;font-weight:600">
-            ${formatValue(c.id,gold)}
-          </div>
-
-          <div style="text-align:center;font-size:13px;color:var(--muted)">
-            ${c.name}
-          </div>
-
-          <div style="text-align:left;font-weight:600">
-            ${formatValue(c.id,opp)}
-          </div>
-
-          <div style="text-align:center;font-size:12px;color:${color}">
-            ${result || "-"}
-          </div>
-        </div>
-      `;
-    }).join("");
-
-    el.innerHTML = `
-      <div class="card">
-
-        <div class="small">
-          MATCHUP PERIOD ${data.period}
-        </div>
-
-        <h2>${esc(goldName)} vs ${esc(opponentName)}</h2>
-
-        <div class="grid">
-
-          <div>
-            <div class="small">GOLD (W-L-T)</div>
-            <h1>
-              ${goldScore.wins ?? 0}-
-              ${goldScore.losses ?? 0}-
-              ${goldScore.ties ?? 0}
-            </h1>
-          </div>
-
-          <div>
-            <div class="small">OPPONENT (W-L-T)</div>
-            <h1>
-              ${oppScore.wins ?? 0}-
-              ${oppScore.losses ?? 0}-
-              ${oppScore.ties ?? 0}
-            </h1>
-          </div>
-
-        </div>
-
-        <div class="small" style="margin-top:16px">
-          CATEGORY BREAKDOWN
-        </div>
-
-        <div class="grid"
-          style="grid-template-columns:1fr 1fr 1fr 1fr;
-          font-size:12px;color:var(--muted);padding:8px 0">
-
-          <div style="text-align:right">GOLD</div>
-          <div style="text-align:center">CATEGORY</div>
-          <div style="text-align:left">OPP</div>
-          <div style="text-align:center">RESULT</div>
-
-        </div>
-
-        ${categoryRows}
-
-        <div class="small" style="margin-top:12px">
-          Live ESPN matchup data
-        </div>
-
-      </div>
-    `;
-
-  } catch(error) {
-    el.innerHTML = `
-      <div class="notice">
-        Unable to load matchup: ${esc(error.message)}
-      </div>
-    `;
-  }
-}
-
-
-  function renderCategories(){document.getElementById("categoryRows").innerHTML=categories.map(c=>{const x=state.categories[c]||{status:"Toss-up",target:"Compete",notes:""};return `<tr><td><strong>${c}</strong>${c==="TO"?' <span class="small">(lower wins)</span>':""}</td><td><select onchange="setCat('${c}','status',this.value)">${["Strong","Toss-up","Weak","Ignore"].map(v=>`<option ${x.status===v?"selected":""}>${v}</option>`).join("")}</select></td><td><select onchange="setCat('${c}','target',this.value)">${["Prioritize","Compete","Punt"].map(v=>`<option ${x.target===v?"selected":""}>${v}</option>`).join("")}</select></td><td><input value="${esc(x.notes)}" placeholder="Notes" onchange="setCat('${c}','notes',this.value)" style="width:130px;background:#10151d;color:white;border:1px solid var(--line);padding:7px;border-radius:8px"></td></tr>`}).join("");document.getElementById("weekStart").value=state.matchup.startDate||"";
-document.getElementById("weekEnd").value=state.matchup.endDate||"";document.getElementById("opponentName").value=state.matchup.opponent||"";document.getElementById("matchupNotes").value=state.matchup.notes||""}
-function setCat(c,k,v){state.categories[c]=state.categories[c]||{status:"Toss-up",target:"Compete",notes:""};state.categories[c][k]=v;save()}
-function addWaiver(){const name=document.getElementById("wName").value.trim();if(!name){alert("Enter a player name.");return}state.waivers.push({name,team:document.getElementById("wTeam").value.trim().toUpperCase(),pos:document.getElementById("wPos").value.trim(),games:Number(document.getElementById("wGames").value)||0,minutes:Number(document.getElementById("wMin").value)||0,fit:document.getElementById("wFit").value,prod:Number(document.getElementById("wProd").value)||0,risk:Number(document.getElementById("wRisk").value)||0});["wName","wTeam","wPos"].forEach(id=>document.getElementById(id).value="");save();renderWaivers()}
-function waiverScore(p){const target=(state.categories[p.fit]?.target||"Compete");const fitBoost=target==="Prioritize"?4:target==="Punt"?-2:0;return (p.prod*2 + p.games*2 + Math.min(p.minutes,36)*.25 + fitBoost - p.risk*5)}
-function renderWaivers(){const list=[...state.waivers].sort((a,b)=>waiverScore(b)-waiverScore(a));document.getElementById("waiverList").innerHTML=list.map((p,i)=>`<div class="item"><div class="row"><div><div class="item-title">${i+1}. ${esc(p.name)}</div><div class="small">${esc(p.team)} · ${esc(p.pos)} · ${esc(p.fit)} focus</div></div><div style="text-align:right"><div class="stat" style="font-size:21px">${waiverScore(p).toFixed(1)}</div><div class="small">heuristic score</div></div></div><div class="row" style="margin-top:8px;flex-wrap:wrap"><span class="badge">${p.games} games left</span><span class="badge">${p.minutes} MPG</span><span class="badge ${p.risk>0?"red":"green"}">Risk ${p.risk}</span><button class="btn ghost" onclick="deleteWaiver(${state.waivers.indexOf(p)})">Remove</button></div></div>`).join("")||`<div class="empty">Add waiver candidates above. For useful rankings, compare several available players and keep inputs current.</div>`}
+function renderHome(){rosterCount.textContent=state.roster.length;rosterPreview.innerHTML=state.roster.slice(0,6).map(p=>`<div class="row"><div><strong>${esc(p.name)}</strong><div class="small">${esc(p.pos)} · ${esc(p.nbaTeamAbbreviation||"")}</div></div><span class="badge ${p.status==="Active"?"green":p.status==="Out"?"red":"gold"}">${esc(p.status||"Unknown")}</span></div>`).join("")||'<div class="empty">Tap Sync ESPN to load your roster.</div>';const tasks=[["Sync roster","Refresh ESPN roster and injury/status fields."],["Check daily lineup","Review player game times and active slots."],["Review category standings","Identify close categories and realistic targets."],["Use available moves wisely","Check schedules and category impact before adding."]];checklist.innerHTML=tasks.map(([a,b],i)=>`<label class="row" style="justify-content:flex-start;align-items:flex-start"><input type="checkbox" ${state.checklist[i]?"checked":""} onchange="state.checklist[${i}]=this.checked;save()" style="margin-top:4px"><span><strong>${a}</strong><div class="small">${b}</div></span></label>`).join("")}
+function renderRoster(){const q=(rosterSearch?.value||"").toLowerCase();const list=state.roster.filter(p=>(p.name+" "+p.pos+" "+p.slot).toLowerCase().includes(q));rosterList.innerHTML=list.map(p=>{const i=state.roster.indexOf(p);return `<div class="item"><div class="row"><div><strong>${esc(p.name)}</strong><div class="small">${esc(p.pos||"Unknown")} · ${esc(p.slot||"Unknown")} · ${esc(p.nbaTeamAbbreviation||"")}</div></div><span class="badge ${p.status==="Active"?"green":p.status==="Out"?"red":"gold"}">${esc(p.status||"Unknown")}</span></div><div class="small" style="margin-top:8px">${p.games||0} games remaining · ${esc(p.injuryStatus||"")}</div><div class="actions"><button class="btn secondary" onclick="editPlayer(${i})">Edit</button><button class="btn secondary" onclick="removePlayer(${i})">Remove</button></div></div>`}).join("")||'<div class="empty">No players loaded.</div>';renderSchedule()}
+function addPlayer(){const name=pName.value.trim();if(!name)return alert("Enter player name.");state.roster.push({name,slot:pSlot.value,team:pTeam.value.toUpperCase(),nbaTeamAbbreviation:pTeam.value.toUpperCase(),pos:pPos.value,games:Number(pGames.value)||0,status:pStatus.value,notes:""});pName.value=pTeam.value=pPos.value="";save();renderRoster()}
+function editPlayer(i){const p=state.roster[i];for(const [k,label] of [["name","Player name"],["slot","Roster slot"],["nbaTeamAbbreviation","NBA team abbreviation"],["pos","Positions"],["games","Games remaining"],["status","Status"]]){const val=prompt(label,p[k]??"");if(val===null)return;p[k]=k==="games"?(Number(val)||0):val}p.team=p.nbaTeamAbbreviation;save();renderRoster()}
+function removePlayer(i){if(confirm("Remove "+state.roster[i].name+" from local roster?")){state.roster.splice(i,1);save();renderRoster()}}
+async function syncESPN(){const status=document.getElementById("dataStatus");status.textContent="Syncing…";try{const r=await fetch(API+"/api/dashboard");if(!r.ok)throw Error("Dashboard endpoint HTTP "+r.status);const d=await r.json();if(!Array.isArray(d.teams))throw Error("Worker response has no teams array.");const team=d.teams.find(t=>Number(t.id)===5)||(d.teams.find(t=>(t.name||"").toLowerCase().includes("gold")));if(!team?.roster)throw Error("Gold roster was not found in response.");const old=new Map(state.roster.map(p=>[String(p.playerId||p.name),p]));state.roster=team.roster.map(p=>{const id=String(p.id??p.playerId??p.name),prev=old.get(id)||{};const injury=p.injuryStatus||"UNKNOWN";return {...prev,playerId:id,name:p.name||prev.name,fantasyTeamId:team.id,nbaTeamId:p.nbaTeamId??prev.nbaTeamId??null,nbaTeamAbbreviation:p.nbaTeamAbbreviation??prev.nbaTeamAbbreviation??null,pos:p.position||prev.pos||"Unknown",slot:String(p.lineupSlotId??prev.slot??""),injuryStatus:injury,status:/OUT|INJURED/i.test(injury)?"Out":injury==="NORMAL"?"Active":prev.status||"Unknown",games:prev.games??0}});state.lastESPNSync=new Date().toISOString();save();status.textContent="Live ESPN";alert("ESPN roster synced: "+state.roster.length+" players.");}catch(e){status.textContent="Connection issue";alert("ESPN sync failed: "+e.message)}}
+function fmt(id,v){if(v==null)return "—";return id===19||id===20?(Number(v)*100).toFixed(1)+"%":Number(v).toLocaleString()}
+function renderIntel(gs,os){const el=document.getElementById("matchupIntel");const rows=categories.map(c=>{const g=gs[c.id]?.score,o=os[c.id]?.score,res=gs[c.id]?.result;if(g==null||o==null)return {name:c.name,a:"MONITOR",cl:"gold",why:"Category data unavailable"};const gap=Math.abs(Number(g)-Number(o));if(res==="WIN")return {name:c.name,a:"PROTECT",cl:"green",why:c.name==="TO"?"Lower turnovers are better—protect this lead.":"Currently leading; avoid sacrificing this category."};if(res==="LOSS"&&gap<=3)return {name:c.name,a:"ATTACK",cl:"gold",why:"Close deficit; target relevant production and games."};if(res==="LOSS")return {name:c.name,a:"MONITOR",cl:"red",why:"Large deficit; assess whether recovery is realistic."};return {name:c.name,a:"MONITOR",cl:"gold",why:"Tied or unresolved; reassess after more games."}});el.innerHTML=rows.map(r=>`<div class="item"><div class="row"><strong>${r.name}</strong><span class="badge ${r.cl}">${r.a}</span></div><div class="small">${r.why}</div></div>`).join("")}
+async function loadLiveMatchup(){const el=document.getElementById("liveMatchup");el.innerHTML='<div class="empty">Loading live matchup…</div>';try{const [mr,dr]=await Promise.all([fetch(API+"/api/matchup"),fetch(API+"/api/dashboard")]);if(!mr.ok)throw Error("Matchup API HTTP "+mr.status);if(!dr.ok)throw Error("Dashboard API HTTP "+dr.status);const d=await mr.json(),dash=await dr.json();if(d.status!=="success")throw Error(d.error||"Worker did not return success");const home=d.matchup?.home,away=d.matchup?.away;if(!home||!away)throw Error("Matchup sides missing");const gold=Number(home.teamId)===5?home:away,opp=gold===home?away:home;const gs=gold.cumulativeScore?.scoreByStat||{},os=opp.cumulativeScore?.scoreByStat||{};renderIntel(gs,os);const gt=dash.teams?.find(t=>Number(t.id)===5),ot=dash.teams?.find(t=>Number(t.id)===Number(opp.teamId));const cats=categories.map(c=>{const res=gs[c.id]?.result;return `<div class="grid" style="grid-template-columns:1fr 1fr 1fr 1fr;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)"><div style="text-align:right;font-weight:700">${fmt(c.id,gs[c.id]?.score)}</div><div style="text-align:center;font-size:12px;color:var(--muted)">${c.name}</div><div style="font-weight:700">${fmt(c.id,os[c.id]?.score)}</div><div class="${res==="WIN"?"status-win":res==="LOSS"?"status-loss":"status-tie"}" style="text-align:center;font-size:12px">${res||"—"}</div></div>`}).join("");const a=gold.cumulativeScore||{},b=opp.cumulativeScore||{};el.innerHTML=`<div class="item"><div class="small">MATCHUP PERIOD ${esc(d.period??"")}</div><h2>${esc(gt?.name||"Gold")} vs ${esc(ot?.name||"Opponent")}</h2><div class="grid"><div><div class="small">GOLD (W-L-T)</div><div class="stat">${a.wins??0}-${a.losses??0}-${a.ties??0}</div></div><div><div class="small">OPPONENT (W-L-T)</div><div class="stat">${b.wins??0}-${b.losses??0}-${b.ties??0}</div></div></div><div class="small" style="margin-top:12px">GOLD · CATEGORY · OPP · RESULT</div>${cats}<p class="small">Live matchup data from Worker. Confirm against ESPN if any category looks inconsistent.</p></div>`;}catch(e){el.innerHTML=`<div class="notice">Unable to load matchup: ${esc(e.message)}</div>`}}
+function saveMatchup(){state.matchup={startDate:weekStart.value,endDate:weekEnd.value,opponent:opponentName.value,notes:matchupNotes.value};save();alert("Matchup notes saved locally.")}
+async function loadPlayerSchedules(){const start=state.matchup.startDate,end=state.matchup.endDate;if(!start||!end||start>end)return alert("Save valid matchup dates first.");try{const counts={};let cur=start;while(cur<=end){const date=cur.replaceAll("-","");const r=await fetch(API+"/api/schedule?date="+date);if(!r.ok)throw Error("Schedule HTTP "+r.status);const d=await r.json();for(const ev of d.events||[])for(const c of ev.competitions?.[0]?.competitors||[]){const id=String(c.team?.id??"");if(id)counts[id]=(counts[id]||0)+1}const [y,m,day]=cur.split("-").map(Number);cur=new Date(Date.UTC(y,m-1,day+1)).toISOString().slice(0,10)}let matched=0;state.roster.forEach(p=>{const id=String(p.nbaTeamId??"");p.games=id&&counts[id]!=null?counts[id]:0;if(id&&counts[id]!=null)matched++});state.scheduleLastUpdated=new Date().toISOString();save();alert(`Schedule loaded. Team IDs matched: ${matched}/${state.roster.length}. If zero, the ESPN/NBA team ID mapping needs to be corrected.`)}catch(e){alert("Schedule loading failed: "+e.message)}}
+function renderSchedule(){const el=document.getElementById("scheduleSummary");if(!el)return;el.innerHTML=[...state.roster].sort((a,b)=>(b.games||0)-(a.games||0)).slice(0,8).map(p=>`<div class="row"><span>${esc(p.name)}</span><span class="badge ${(p.games||0)>=4?"green":"gold"}">${p.games||0} games</span></div>`).join("")||'<div class="empty">Sync roster and load schedule.</div>'}
+function addWaiver(){const name=wName.value.trim();if(!name)return alert("Enter a player name.");state.waivers.push({name,team:wTeam.value.trim().toUpperCase(),pos:wPos.value.trim(),games:Number(wGames.value)||0,minutes:Number(wMin.value)||0,fit:wFit.value,prod:Number(wProd.value)||0,risk:Number(wRisk.value)||0});save();renderWaivers();wName.value=wTeam.value=wPos.value=""}
+function waiverScore(p){return p.prod*2+p.games*2+Math.min(p.minutes,36)*.25-p.risk*5}
+function renderWaivers(){const list=[...state.waivers].sort((a,b)=>waiverScore(b)-waiverScore(a));waiverList.innerHTML=list.map((p,i)=>`<div class="item"><div class="row"><div><strong>${i+1}. ${esc(p.name)}</strong><div class="small">${esc(p.team)} · ${esc(p.pos)} · ${esc(p.fit)} focus</div></div><div class="stat" style="font-size:20px">${waiverScore(p).toFixed(1)}</div></div><div class="actions"><span class="badge">${p.games} games</span><span class="badge">${p.minutes} MPG</span><span class="badge ${p.risk?"red":"green"}">Risk ${p.risk}</span><button class="btn ghost" onclick="deleteWaiver(${state.waivers.indexOf(p)})">Remove</button></div></div>`).join("")||'<div class="empty">Add candidates above.</div>'}
 function deleteWaiver(i){state.waivers.splice(i,1);save();renderWaivers()}
-function analyzeTrade(){const give=document.getElementById("giveNames").value.split(",").map(s=>s.trim()).filter(Boolean),get=document.getElementById("getNames").value.split(",").map(s=>s.trim()).filter(Boolean);const find=n=>state.roster.find(p=>p.name.toLowerCase()===n.toLowerCase());let notes=[];const gv=give.map(find),gt=get.map(find);if(gv.some(x=>!x))notes.push("Some players you give are not in your current roster list; their data needs to be entered.");const risk=document.getElementById("tradeRisk").value,need=document.getElementById("tradeNeed").value;const out=`<div class="item"><div class="item-title">Trade review: ${esc(give.join(", ")||"—")} → ${esc(get.join(", ")||"—")}</div><p class="small">Your priority: ${esc(need)} · Risk approach: ${esc(risk)}</p><p>This prototype does not have live player projections, so it cannot reliably declare a winner from names alone.</p><ul><li>Check whether the incoming player improves your chosen category.</li><li>Compare games remaining and role/injury news for every player.</li><li>Confirm positional eligibility and center-slot limits.</li><li>Consider how the deal affects all nine categories, including turnovers.</li></ul>${notes.map(n=>`<div class="notice">${esc(n)}</div>`).join("")}</div>`;document.getElementById("tradeResult").innerHTML=out}
-function exportData(){const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="fantasy-command-center-backup.json";a.click();URL.revokeObjectURL(url)}
-function importData(e){const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const x=JSON.parse(reader.result);if(!x.roster||!Array.isArray(x.roster))throw Error();state=x;save();alert("Backup imported.")}catch(err){alert("Could not import this backup JSON.")}};reader.readAsText(file)}
-function resetData(){if(confirm("Reset all local roster, matchup and waiver data on this device? Export a backup first if needed.")){localStorage.removeItem(KEY);state=load();renderAll()}}
-function renderAll(){renderHome();renderRoster();renderCategories();renderWaivers()}
+function analyzeTrade(){const give=giveNames.value.split(",").map(x=>x.trim()).filter(Boolean),get=getNames.value.split(",").map(x=>x.trim()).filter(Boolean);tradeResult.innerHTML=`<div class="item"><strong>${esc(give.join(", ")||"—")} → ${esc(get.join(", ")||"—")}</strong><p class="small">Priority: ${esc(tradeNeed.value)} · Risk: ${esc(tradeRisk.value)}</p><ul><li>Compare real season and recent stats, not names alone.</li><li>Review injury status, role, minutes, and playoff schedule.</li><li>Check all nine category effects and center-slot eligibility.</li><li>Do not accept based on this checklist alone; no live projection model is connected.</li></ul></div>`}
+function exportData(){const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="fantasy-command-center-backup.json";a.click();URL.revokeObjectURL(url)}
+function importData(e){const f=e.target.files?.[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!Array.isArray(x.roster))throw Error();state={...state,...x};save();alert("Backup imported")}catch(err){alert("Invalid backup JSON")}};r.readAsText(f)}
+function resetData(){if(confirm("Clear local data? Export backup first.")){localStorage.removeItem(KEY);state=loadState();renderAll()}}
+async function testEndpoints(){const el=document.getElementById("diagnostics");el.textContent="Testing…";const out=[];for(const path of ["/api/dashboard","/api/matchup"]){try{const r=await fetch(API+path);const t=await r.text();out.push(path+" → HTTP "+r.status+"\n"+t.slice(0,350))}catch(e){out.push(path+" → "+e.message)}}el.textContent=out.join("\n\n")}
+function renderCategories(){}
+function renderAll(){renderHome();renderRoster();renderWaivers();if(state.matchup.startDate)weekStart.value=state.matchup.startDate;if(state.matchup.endDate)weekEnd.value=state.matchup.endDate;opponentName.value=state.matchup.opponent||"";matchupNotes.value=state.matchup.notes||""}
 renderAll();
+syncESPN().catch(console.error);
 loadLiveMatchup();
-
-fetch("https://fantasy-command-center-api.z92zyjm7cm.workers.dev/api/dashboard")
-  .then(r => {
-    if (!r.ok) throw new Error("Dashboard request failed: " + r.status);
-    return r.json();
-  })
-  .then(data => {
-    if (!data.teams) throw new Error("No team data returned.");
-
-    const team = data.teams.find(t =>
-      (t.name || "").toLowerCase().includes("gold")
-    );
-
-    if (!team || !team.roster) {
-      throw new Error("Could not find the gold team's roster.");
-    }
-const opponent = data.teams.find(t => t.id !== team.id);
-
-if (!opponent || !opponent.roster) {
-  throw new Error("Could not find opponent roster.");
-}
-
-state.opponentRoster = opponent.roster.map(p => ({
-  name: p.name,
-  nbaTeamAbbreviation: p.nbaTeamAbbreviation ?? null,
-  status: /OUT|INJURED/i.test(p.injuryStatus || "")
-    ? "Out"
-    : (p.injuryStatus === "NORMAL" ? "Active" : "Unknown"),
-  games: 0
-}));
-    const positionNames = {
-      1: "PG",
-      2: "SG",
-      3: "SF",
-      4: "PF",
-      5: "C"
-    };
-
-  
-const previousRoster = state.roster || [];
-
-const previousById = new Map(
-  previousRoster.map(p => [
-    String(p.playerId ?? p.id ?? p.name),
-    p
-  ])
-);
-
-state.roster = team.roster.map(p => {
-  const playerId = String(p.id ?? p.playerId ?? p.name);
-  const previous = previousById.get(playerId) || {};
-
-  return {
-    ...previous,
-
-    playerId,
-    name: p.name,
-    fantasyTeamId: team.id,
-
-    nbaTeamId: p.nbaTeamId ?? previous.nbaTeamId ?? null,
-    nbaTeamAbbreviation:
-      p.nbaTeamAbbreviation ??
-      previous.nbaTeamAbbreviation ??
-      null,
-
-    pos: p.position || previous.pos || "Unknown",
-    slot: String(p.lineupSlotId ?? previous.slot ?? ""),
-
-    status: /OUT|INJURED/i.test(p.injuryStatus || "")
-      ? "Out"
-      : p.injuryStatus === "NORMAL"
-        ? "Active"
-        : previous.status || "Unknown",
-
-    injuryStatus: p.injuryStatus || "UNKNOWN",
-
-    games: previous.games ?? 0,
-    notes: previous.notes || "",
-
-    lastUpdated: new Date().toISOString()
-  };
-});
-
-state.lastESPNSync = new Date().toISOString();
-save();
-
-    const status = document.getElementById("dataStatus");
-    if (status) status.textContent = "Live ESPN";
-
-    console.log("Live roster loaded:", state.roster);
-  })
-  .catch(err => console.error("ESPN dashboard connection failed:", err));
-  
-
-
 </script>
-</body></html>
+</body>
+</html>
