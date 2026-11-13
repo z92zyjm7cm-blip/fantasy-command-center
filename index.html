@@ -172,35 +172,78 @@ function removePlayer(i){if(confirm("Remove "+state.roster[i].name+" from your l
 
 
 
-async function loadPlayerSchedules(){
-  try{
-    const start=state.matchup.startDate;
-    const end=state.matchup.endDate;
 
-    if(!start||!end||start>end){
+async function loadPlayerSchedules() {
+  try {
+    const start = state.matchup.startDate;
+    const end = state.matchup.endDate;
+
+    if (!start || !end || start > end) {
       alert("Please save valid matchup dates first.");
       return;
     }
 
-    const gamesByTeamId={};
-    let cursor=start;
+    const gamesByTeamId = {};
+    let cursor = start;
 
-    while(cursor<=end){
-      const date=cursor.replaceAll("-","");
-      const res=await fetch(
+    while (cursor <= end) {
+      const date = cursor.replaceAll("-", "");
+
+      const res = await fetch(
         `https://fantasy-command-center-api.z92zyjm7cm.workers.dev/api/schedule?date=${date}`
       );
 
-      if(!res.ok)throw new Error("Schedule API error");
+      if (!res.ok) {
+        throw new Error("Schedule API error: " + res.status);
+      }
 
-      const data=await res.json();
+      const data = await res.json();
 
-      for(const event of data.events||[]){
-  for(const c of event.competitions?.[0]?.competitors||[]){
-    const teamId=c.team?.id;
-    if(teamId){
-      gamesByTeamId[teamId]=(gamesByTeamId[teamId]||0)+1;
+      for (const event of data.events || []) {
+        for (const competitor of
+          event.competitions?.[0]?.competitors || []) {
+
+          const teamId = String(competitor.team?.id ?? "");
+
+          if (teamId) {
+            gamesByTeamId[teamId] =
+              (gamesByTeamId[teamId] || 0) + 1;
+          }
+        }
+      }
+
+      const [y, m, d] = cursor.split("-").map(Number);
+
+      cursor = new Date(Date.UTC(y, m - 1, d + 1))
+        .toISOString()
+        .slice(0, 10);
     }
+
+    let matched = 0;
+
+    state.roster.forEach(player => {
+      const teamId = String(player.nbaTeamId ?? "");
+
+      if (teamId && gamesByTeamId[teamId] !== undefined) {
+        player.games = gamesByTeamId[teamId];
+        matched++;
+      } else {
+        player.games = 0;
+      }
+    });
+
+    state.scheduleLastUpdated = new Date().toISOString();
+
+    save();
+
+    alert(
+      `Schedule loaded!\n` +
+      `Players matched: ${matched}/${state.roster.length}`
+    );
+
+  } catch (error) {
+    console.error("Schedule loading failed:", error);
+    alert("Schedule loading failed: " + error.message);
   }
 }
 
@@ -274,28 +317,7 @@ function renderMatchupIntel(goldStats, oppStats) {
       };
     }
 
-    const gap = Math.abs(Number(g) - Number(o));
-
-    let action, color, reason;
-
-    if (result === "WIN") {
-      action = "PROTECT";
-      color = "green";
-      reason = "Currently leading. Avoid sacrificing this category.";
-    } else if (result === "LOSS" && gap <= 3) {
-      action = "ATTACK";
-      color = "gold";
-      reason = "Close deficit. Prioritize players with games remaining.";
-    } else if (result === "LOSS") {
-      action = "MONITOR";
-      color = "red";
-      reason = "Deficit is substantial. Evaluate recovery potential.";
-    } else {
-      action = "MONITOR";
-      color = "gold";
-      reason = "Category result unavailable.";
-    }
-
+  
     return {name:c.name,action,color,reason,gap};
   });
 
